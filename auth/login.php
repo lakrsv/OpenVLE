@@ -1,6 +1,6 @@
 <?php
 
-require_once '../config/mysql_config.php';
+require_once 'mysql_config.php';
 
 class User {
 
@@ -22,14 +22,19 @@ class User {
             $statement = $this->CreateLoginStatement($connection);
             $statement->execute();
 
-            if ($statement->fetchColumn()) {
-                $success = true;
-                session_start();
-                session_regenerate_id();
-                $_SESSION['user'] = $this->username;
-                session_write_close();
-                echo 'Success';
-                exit();
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
+            
+            // TODO - Cleanup
+            if ($result) {
+                if (password_verify($this->password, $result['password'])) {
+                    $success = true;
+                    session_start();
+                    session_regenerate_id();
+                    $_SESSION['username'] = $this->username;
+                    session_write_close();
+                    echo 'Success';
+                    exit();
+                }
             }
             return $success;
         } catch (PDOException $e) {
@@ -39,10 +44,9 @@ class User {
     }
 
     private function CreateLoginStatement($connection) {
-        $sql = "SELECT * FROM Users WHERE username = :username AND password = :password LIMIT 1";
+        $sql = "SELECT * FROM Users WHERE username = :username LIMIT 1";
         $statement = $connection->prepare($sql);
         $statement->bindValue("username", $this->username, PDO::PARAM_STR);
-        $statement->bindValue("password", $this->password, PDO::PARAM_STR);
         return $statement;
     }
 

@@ -45,7 +45,7 @@
                                     e.preventDefault();
                                     $.ajax({
                                         type: "POST",
-                                        url: "class/login.php",
+                                        url: "auth/login.php",
                                         data: {
                                             username: $('#username').val(),
                                             password: $('#password').val()
