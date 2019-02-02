@@ -13,11 +13,10 @@
             src="https://code.jquery.com/jquery-3.3.1.min.js"
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
-        
+
         <title>Hello, world!</title>
     </head>
     <body>
-
         <!-- Log In Container -->
         <div class="container">
             <div class="row">
@@ -46,11 +45,14 @@
                                     e.preventDefault();
                                     $.ajax({
                                         type: "POST",
-                                        url: "/class/login.php",
-                                        data: $(this).serialize(),
+                                        url: "class/login.php",
+                                        data: {
+                                            username: $('#username').val(),
+                                            password: $('#password').val()
+                                        },
                                         success: function (data) {
                                             if (data === "Success") {
-                                                window.location = '/user-home.php';
+                                                window.location = 'user-home.php';
                                             } else {
                                                 alert("Invalid Username/Password");
                                             }

@@ -1,6 +1,6 @@
 <?php
 
-require_once 'config/mysql_config.php';
+require_once '../config/mysql_config.php';
 
 class User {
 
@@ -17,7 +17,8 @@ class User {
     public function Login() {
         $success = false;
         try {
-            $connection = MysqlConfig::Connect();
+            $config = new MysqlConfig();
+            $connection = $config->Connect();
             $statement = $this->CreateLoginStatement($connection);
             $statement->execute();
 
@@ -47,5 +48,5 @@ class User {
 
 }
 
-$user = new User(array("username" => $_POST['username'], "password" => $_POST['password']));
+$user = new User(["username" => $_POST['username'], "password" => $_POST['password']]);
 $user->Login();
