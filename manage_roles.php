@@ -30,6 +30,13 @@ if (!$userRole->HasPermission("manage_roles")) {
         <title>OpenVLE - Admin</title>
     </head>
     <body>
+
+        <script>
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+        </script>
+
         <nav class="navbar navbar-expand-md navbar-dark bg-dark static-top">
             <a class="navbar-brand" href="#">OpenVLE Admin</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapse" aria-controls="collapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +77,7 @@ if (!$userRole->HasPermission("manage_roles")) {
                         <th scope="col">Role</th>
                         <?php
                         foreach ($allPermissions as $permission) {
-                            echo '<th scope="col">' . $permission->GetName() . '</th>';
+                            echo '<th scope="col" data-toggle="tooltip" data-placement="bottom" title="' . $permission->GetDescription() . '">' . $permission->GetName() . '</th>';
                         }
                         ?>
                     </tr>
@@ -78,15 +85,15 @@ if (!$userRole->HasPermission("manage_roles")) {
                 <tbody>
                     <?php
                     foreach ($allRoles as $role) {
-                        echo '<tr id='.$role->GetId().'>';
+                        echo '<tr id=' . $role->GetId() . '>';
                         echo '<th scope="row">' . $role->GetName() . '</th>';
                         foreach ($allPermissions as $permission) {
                             $hasPermission = $role->HasPermission($permission->GetName());
                             $checked = $hasPermission ? "checked" : "";
-                            
-                            echo '<td id='.$permission->GetId().'>';
+
+                            echo '<td id=' . $permission->GetId() . '>';
                             echo '<div>';
-                            echo '<input type="checkbox" '.$checked.'>';
+                            echo '<input type="checkbox" ' . $checked . '>';
                             echo '</div>';
                             echo '</td>';
                         }
