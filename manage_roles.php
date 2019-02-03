@@ -57,7 +57,7 @@ if (!$userRole->HasPermission("manage_roles")) {
                 <a id="logout" class="btn btn-outline-danger pull-right my-2 my-sm-0" href="auth/log_out.php">Log Out</a>
             </div>
         </nav>
-        <div class="container mt-2">
+        <div class="container-fluid mt-2">
             <!-- Display Roles -->
             <?php
             $allRoles = Role::GetAll();
@@ -71,6 +71,7 @@ if (!$userRole->HasPermission("manage_roles")) {
             }
             ?>
 
+            <div class="table-responsive">
             <table class="table table-striped table-bordered">
                 <thead class="thead-dark">
                     <tr>
@@ -102,6 +103,7 @@ if (!$userRole->HasPermission("manage_roles")) {
                     ?>
                 </tbody>
             </table>
+            </div>
 
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
