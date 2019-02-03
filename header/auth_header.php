@@ -9,4 +9,4 @@ if (!isset($_SESSION['userid'])) {
     header("Location: index.php");
 }
 
-$role = Role::GetRoleFromUserId($_SESSION['userid']);
+$userRole = Role::GetRoleFromUserId($_SESSION['userid']);

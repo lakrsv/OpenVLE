@@ -4,27 +4,47 @@ require_once 'mysql_config.php';
 
 class Role {
 
-    private $roleId;
-    private $roleName;
+    private $id;
+    private $name;
     private $permissions;
 
     public function __construct($roleId) {
-        $this->roleId = $roleId;
-        $this->roleName = $this->FetchRoleName($roleId);
+        $this->id = $roleId;
+        $this->name = $this->FetchRoleName($roleId);
         $this->permissions = $this->FetchPermissions($roleId);
     }
 
     public static function GetRoleFromUserId($userId) {
         $connection = MysqlConfig::Connect();
-        $statement = Role::CreateRoleStatement($connection, $userId);
+        $sql = "SELECT roleId FROM UserRoles WHERE userId = :userid LIMIT 1";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("userid", $userId, PDO::PARAM_STR);
         $statement->execute();
 
         $roleId = $statement->fetchColumn();
         return new Role($roleId);
     }
 
-    public function GetRoleName() {
-        return $this->roleName;
+    public static function GetAll() {
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT id FROM Roles";
+        $statement = $connection->prepare($sql);
+        $statement->execute();
+
+        $roles = array();
+        while ($row = $statement->fetchColumn()) {
+            array_push($roles, new Role($row));
+        }
+
+        return $roles;
+    }
+
+    public function GetId() {
+        return $this->id;
+    }
+
+    public function GetName() {
+        return $this->name;
     }
 
     public function HasPermission($permissionName) {
@@ -33,7 +53,9 @@ class Role {
 
     private function FetchRoleName() {
         $connection = MysqlConfig::Connect();
-        $statement = $this->CreateRoleNameStatement($connection);
+        $sql = "SELECT name FROM Roles WHERE id = :roleid LIMIT 1";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("roleid", $this->id, PDO::PARAM_STR);
         $statement->execute();
 
         return $statement->fetchColumn();
@@ -41,7 +63,9 @@ class Role {
 
     private function FetchPermissions($roleId) {
         $connection = MysqlConfig::Connect();
-        $statement = $this->CreatePermissionsStatement($connection);
+        $sql = "SELECT p.name FROM RolePermissions rp INNER JOIN Permissions p ON rp.permissionId = p.id WHERE rp.roleId = :roleid";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("roleid", $this->id, PDO::PARAM_STR);
         $statement->execute();
 
         $permissions = array();
@@ -50,27 +74,6 @@ class Role {
         }
 
         return $permissions;
-    }
-
-    private function CreateRoleNameStatement($connection) {
-        $sql = "SELECT name FROM Roles WHERE id = :roleid LIMIT 1";
-        $statement = $connection->prepare($sql);
-        $statement->bindValue("roleid", $this->roleId, PDO::PARAM_STR);
-        return $statement;
-    }
-
-    private static function CreateRoleStatement($connection, $userId) {
-        $sql = "SELECT roleId FROM UserRoles WHERE userId = :userid LIMIT 1";
-        $statement = $connection->prepare($sql);
-        $statement->bindValue("userid", $userId, PDO::PARAM_STR);
-        return $statement;
-    }
-
-    private function CreatePermissionsStatement($connection) {
-        $sql = "SELECT p.name FROM RolePermissions rp INNER JOIN Permissions p ON rp.permissionId = p.id WHERE rp.roleId = :roleid";
-        $statement = $connection->prepare($sql);
-        $statement->bindValue("roleid", $this->roleId, PDO::PARAM_STR);
-        return $statement;
     }
 
 }
