@@ -10,7 +10,7 @@ class Role {
 
     public function __construct($roleId) {
         $this->roleId = $roleId;
-        $this->roleName = ucfirst($this->FetchRoleName($roleId));
+        $this->roleName = $this->FetchRoleName($roleId);
         $this->permissions = $this->FetchPermissions($roleId);
     }
 
@@ -22,12 +22,12 @@ class Role {
         $roleId = $statement->fetchColumn();
         return new Role($roleId);
     }
-    
-    public function GetRoleName(){
+
+    public function GetRoleName() {
         return $this->roleName;
     }
-    
-    public function HasPermission($permissionName){
+
+    public function HasPermission($permissionName) {
         return isset($this->permissions[$permissionName]) || isset($this->permissions["admin"]);
     }
 
@@ -35,7 +35,7 @@ class Role {
         $connection = MysqlConfig::Connect();
         $statement = $this->CreateRoleNameStatement($connection);
         $statement->execute();
-        
+
         return $statement->fetchColumn();
     }
 
@@ -43,12 +43,12 @@ class Role {
         $connection = MysqlConfig::Connect();
         $statement = $this->CreatePermissionsStatement($connection);
         $statement->execute();
-        
+
         $permissions = array();
-        while($row = $statement->fetchColumn()){
+        while ($row = $statement->fetchColumn()) {
             $permissions[$row] = true;
         }
-        
+
         return $permissions;
     }
 

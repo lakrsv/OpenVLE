@@ -7,14 +7,17 @@
 
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-
+        
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="css/custom.css">
+        
         <!-- JQuery -->
         <script
             src="https://code.jquery.com/jquery-3.3.1.min.js"
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
 
-        <title>Hello, world!</title>
+        <title>OpenVLE - Your Gateway to Learning</title>
     </head>
     <body>
         <!-- Log In Container -->
