@@ -4,8 +4,8 @@ require_once 'mysql_config.php';
 
 class User {
 
-    public $username = null;
-    public $password = null;
+    private $username;
+    private $password;
 
     public function __construct($data = array()) {
         if (isset($data['username'], $data['password'])) {
@@ -17,20 +17,22 @@ class User {
     public function Login() {
         $success = false;
         try {
-            $config = new MysqlConfig();
-            $connection = $config->Connect();
+            $connection = MysqlConfig::Connect();
             $statement = $this->CreateLoginStatement($connection);
             $statement->execute();
 
             $result = $statement->fetch(PDO::FETCH_ASSOC);
-            
+
             // TODO - Cleanup
             if ($result) {
                 if (password_verify($this->password, $result['password'])) {
                     $success = true;
                     session_start();
                     session_regenerate_id();
+
                     $_SESSION['username'] = $this->username;
+                    $_SESSION['userid'] = $result['id'];
+
                     session_write_close();
                     echo 'Success';
                     exit();
