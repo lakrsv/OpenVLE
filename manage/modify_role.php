@@ -16,6 +16,21 @@ $action = $_POST['action'];
 
 switch ($action){
     case 'delete':
-        echo "Deleting role ".$roleId;
-        break;
+        return TryDeleteRole($roleId);
+}
+
+function TryDeleteRole($roleId){
+    $response = array();
+    if(Role::AnyUserHasRoleWithId($roleId)){
+        $response['success'] = FALSE;
+        $response['message'] = "Can't delete role as users are currently assigned to it";
+        echo json_encode($response);
+        return FALSE;
+    }
+    else{
+        $response['success'] = TRUE;
+        $response['message'] = "Successfully deleted role";
+        echo json_encode($response);
+        return FALSE;
+    }
 }

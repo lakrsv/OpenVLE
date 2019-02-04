@@ -119,6 +119,14 @@ if (!$userRole->HasPermission("manage_roles")) {
                 </table>
             </div>
 
+            <!-- Alert Box -->
+            <div id ="deleteAlert" class="alert alert-danger alert-dismissible fade show invisible" role="alert">
+                <div id="deleteAlertBody"></div>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
             <!-- Delete Role Script -->
             <script>
                 var $roleId;
@@ -139,7 +147,6 @@ if (!$userRole->HasPermission("manage_roles")) {
                     });
                     $('#deleteRoleButton').click(function (e) {
                         e.preventDefault();
-                        alert($roleId);
                         $.ajax({
                             type: "POST",
                             url: "manage/modify_role.php",
@@ -148,7 +155,25 @@ if (!$userRole->HasPermission("manage_roles")) {
                                 role: $roleId
                             },
                             success: function (data) {
-                                alert(data);
+                                data = $.parseJSON(data);
+                                var $success = data.success;
+                                var $message = data.message;
+
+                                var $alert = $('#deleteAlert')
+                                $alert.removeClass("invisible");
+                                if ($success) {
+                                   $alert.removeClass("alert-danger");
+                                   $alert.addClass("alert-success");
+                                   $alert.find("#deleteAlertBody").html(function(){
+                                       return "<strong>Success!</strong> " + $message;
+                                   });
+                                } else {
+                                   $alert.removeClass("alert-success");
+                                   $alert.addClass("alert-danger");
+                                   $alert.find("#deleteAlertBody").html(function(){
+                                       return "<strong>Failure!</strong> " + $message;
+                                   });
+                                }
                             }
                         });
                     });
@@ -170,7 +195,7 @@ if (!$userRole->HasPermission("manage_roles")) {
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                            <button id="deleteRoleButton" type="button" class="btn btn-primary">Yes</button>
+                            <button id="deleteRoleButton" type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
                         </div>
                     </div>
                 </div>

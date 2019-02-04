@@ -14,6 +14,15 @@ class Role {
         $this->permissions = $this->FetchPermissions($roleId);
     }
 
+    public static function AnyUserHasRoleWithId($roleId){
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT id FROM UserRoles WHERE roleId = :roleid LIMIT 1";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("roleid", $roleId);
+        $statement->execute();
+        
+        return count($statement->fetchAll()) > 0 ? TRUE : FALSE;
+    }
     public static function GetRoleFromUserId($userId) {
         $connection = MysqlConfig::Connect();
         $sql = "SELECT roleId FROM UserRoles WHERE userId = :userid LIMIT 1";
