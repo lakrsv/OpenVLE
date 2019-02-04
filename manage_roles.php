@@ -18,6 +18,9 @@ if (!$userRole->HasPermission("manage_roles")) {
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
         <!-- Custom CSS -->
         <link rel="stylesheet" href="css/custom.css">
 
@@ -72,37 +75,105 @@ if (!$userRole->HasPermission("manage_roles")) {
             ?>
 
             <div class="table-responsive">
-            <table class="table table-striped table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Role</th>
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Role</th>
+                            <?php
+                            foreach ($allPermissions as $permission) {
+                                echo '<th scope="col" data-toggle="tooltip" data-placement="bottom" title="' . $permission->GetDescription() . '">' . $permission->GetName() . '</th>';
+                            }
+                            ?>
+                        </tr>
+                    </thead>
+                    <tbody>
                         <?php
-                        foreach ($allPermissions as $permission) {
-                            echo '<th scope="col" data-toggle="tooltip" data-placement="bottom" title="' . $permission->GetDescription() . '">' . $permission->GetName() . '</th>';
+                        foreach ($allRoles as $role) {
+                            echo '<tr id=' . $role->GetId() . '>';
+                            echo '<th scope="row">';
+                            echo '<div class="row">';
+                            echo '<div class="col-8 rolename">';
+                            echo $role->GetName();
+                            echo '</div>';
+                            if ($role->GetName() != "admin") {
+                                echo '<div class="col-4">';
+                                echo '<a class="far fa-times-circle pull-right text-danger no-decoration deleterole" href="#"></a>';
+                                echo '</div>';
+                            }
+                            echo '</div>';
+                            echo '</th>';
+                            foreach ($allPermissions as $permission) {
+                                $hasPermission = $role->HasPermission($permission->GetName());
+                                $checked = $hasPermission ? "checked" : "";
+
+                                echo '<td id=' . $permission->GetId() . '>';
+                                echo '<div>';
+                                echo '<input type="checkbox" ' . $checked . '>';
+                                echo '</div>';
+                                echo '</td>';
+                            }
+                            echo '</tr>';
                         }
                         ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    foreach ($allRoles as $role) {
-                        echo '<tr id=' . $role->GetId() . '>';
-                        echo '<th scope="row">' . $role->GetName() . '</th>';
-                        foreach ($allPermissions as $permission) {
-                            $hasPermission = $role->HasPermission($permission->GetName());
-                            $checked = $hasPermission ? "checked" : "";
+                    </tbody>
+                </table>
+            </div>
 
-                            echo '<td id=' . $permission->GetId() . '>';
-                            echo '<div>';
-                            echo '<input type="checkbox" ' . $checked . '>';
-                            echo '</div>';
-                            echo '</td>';
-                        }
-                        echo '</tr>';
-                    }
-                    ?>
-                </tbody>
-            </table>
+            <!-- Delete Role Script -->
+            <script>
+                var $roleId;
+                $(document).ready(function () {
+                    $('.deleterole').click(function (e) {
+                        e.preventDefault();
+                        var $row = $(this).closest("tr");
+                        $roleId = $row.attr('id');
+                        var $roleName = $row.find('.rolename').text();
+                        var $modal = $('#deleteRoleModal');
+                        $modal.find('.modal-body').html(function () {
+                            return "You are about delete the role <strong>" + $roleName + "</strong>."
+                                    + "<br><strong>Are you sure?</strong>";
+                        });
+                        $modal.modal({
+                            show: true
+                        });
+                    });
+                    $('#deleteRoleButton').click(function (e) {
+                        e.preventDefault();
+                        alert($roleId);
+                        $.ajax({
+                            type: "POST",
+                            url: "manage/modify_role.php",
+                            data: {
+                                action: "delete",
+                                role: $roleId
+                            },
+                            success: function (data) {
+                                alert(data);
+                            }
+                        });
+                    });
+                });
+            </script>
+
+            <!-- Delete Role Confirmation Modal -->
+            <div class="modal fade" id="deleteRoleModal" tabindex="-1" role="dialog" aria-labelledby="deleteRoleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteRoleModalLabel">Delete Role</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            You are about to delete this role! Are you sure?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                            <button id="deleteRoleButton" type="button" class="btn btn-primary">Yes</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
