@@ -149,7 +149,7 @@ if (!$userRole->HasPermission("manage_roles")) {
                                     var $success = data.success;
                                     var $message = data.message;
 
-                                    var $alert = $('#deleteAlert')
+                                    var $alert = $('#deleteAlert');
                                     $alert.removeClass("invisible");
                                     if ($success) {
                                         $alert.removeClass("alert-danger");
@@ -157,7 +157,7 @@ if (!$userRole->HasPermission("manage_roles")) {
                                         $alert.find("#deleteAlertBody").html(function () {
                                             return "<strong>Success!</strong> " + $message;
                                         });
-                                        $('#role-'+$roleId).remove();
+                                        $('#role-' + $roleId).remove();
 
                                     } else {
                                         $alert.removeClass("alert-success");
