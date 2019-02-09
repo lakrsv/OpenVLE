@@ -58,7 +58,7 @@
                                         },
                                         success: function (data) {
                                             if (data === "Success") {
-                                                window.location = 'user-home.php';
+                                                window.location = 'user_home.php';
                                             } else {
                                                 alert("Invalid Username/Password");
                                             }
