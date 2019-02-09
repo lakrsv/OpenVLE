@@ -23,6 +23,15 @@ class Role {
         
         return count($statement->fetchAll()) > 0 ? TRUE : FALSE;
     }
+    
+    public static function DeleteRoleWithId($roleId){
+        $connection = MysqlConfig::Connect();
+        $sql = "DELETE FROM RolePermissions WHERE roleId = :roleid;DELETE FROM Roles WHERE id = :roleid";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("roleid", $roleId, PDO::PARAM_STR);
+        $statement->execute();
+    }
+    
     public static function GetRoleFromUserId($userId) {
         $connection = MysqlConfig::Connect();
         $sql = "SELECT roleId FROM UserRoles WHERE userId = :userid LIMIT 1";

@@ -28,9 +28,10 @@ function TryDeleteRole($roleId){
         return FALSE;
     }
     else{
+        Role::DeleteRoleWithId($roleId);      
         $response['success'] = TRUE;
         $response['message'] = "Successfully deleted role";
         echo json_encode($response);
-        return FALSE;
+        return TRUE;
     }
 }

@@ -74,7 +74,7 @@ if (!$userRole->HasPermission("manage_roles")) {
             }
             ?>
 
-            <div class="table-responsive">
+            <div id="roleTable" class="table-responsive">
                 <table class="table table-striped table-bordered">
                     <thead class="thead-dark">
                         <tr>
@@ -89,7 +89,7 @@ if (!$userRole->HasPermission("manage_roles")) {
                     <tbody>
                         <?php
                         foreach ($allRoles as $role) {
-                            echo '<tr id=' . $role->GetId() . '>';
+                            echo '<tr id=role-' . $role->GetId() . '>';
                             echo '<th scope="row">';
                             echo '<div class="row">';
                             echo '<div class="col-8 rolename">';
@@ -106,7 +106,7 @@ if (!$userRole->HasPermission("manage_roles")) {
                                 $hasPermission = $role->HasPermission($permission->GetName());
                                 $checked = $hasPermission ? "checked" : "";
 
-                                echo '<td id=' . $permission->GetId() . '>';
+                                echo '<td id=permission-' . $permission->GetId() . '>';
                                 echo '<div>';
                                 echo '<input type="checkbox" ' . $checked . '>';
                                 echo '</div>';
@@ -117,68 +117,66 @@ if (!$userRole->HasPermission("manage_roles")) {
                         ?>
                     </tbody>
                 </table>
+                <!-- Delete Role Script -->
+                <script>
+                    var $roleId;
+                    $(document).ready(function () {
+                        $('.deleterole').click(function (e) {
+                            e.preventDefault();
+                            var $row = $(this).closest("tr");
+                            $roleId = $row.attr('id').replace('role-', '');
+                            var $roleName = $row.find('.rolename').text();
+                            var $modal = $('#deleteRoleModal');
+                            $modal.find('.modal-body').html(function () {
+                                return "You are about delete the role <strong>" + $roleName + "</strong>."
+                                        + "<br><strong>Are you sure?</strong>";
+                            });
+                            $modal.modal({
+                                show: true
+                            });
+                        });
+                        $('#deleteRoleButton').click(function (e) {
+                            e.preventDefault();
+                            $.ajax({
+                                type: "POST",
+                                url: "manage/modify_role.php",
+                                data: {
+                                    action: "delete",
+                                    role: $roleId
+                                },
+                                success: function (data) {
+                                    data = $.parseJSON(data);
+                                    var $success = data.success;
+                                    var $message = data.message;
+
+                                    var $alert = $('#deleteAlert')
+                                    $alert.removeClass("invisible");
+                                    if ($success) {
+                                        $alert.removeClass("alert-danger");
+                                        $alert.addClass("alert-success");
+                                        $alert.find("#deleteAlertBody").html(function () {
+                                            return "<strong>Success!</strong> " + $message;
+                                        });
+                                        $('#role-'+$roleId).remove();
+
+                                    } else {
+                                        $alert.removeClass("alert-success");
+                                        $alert.addClass("alert-danger");
+                                        $alert.find("#deleteAlertBody").html(function () {
+                                            return "<strong>Failure!</strong> " + $message;
+                                        });
+                                    }
+                                }
+                            });
+                        });
+                    });
+                </script>
             </div>
 
             <!-- Alert Box -->
-            <div id ="deleteAlert" class="alert alert-danger alert-dismissible fade show invisible" role="alert">
+            <div id ="deleteAlert" class="alert alert-danger show invisible" role="alert">
                 <div id="deleteAlertBody"></div>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
             </div>
-
-            <!-- Delete Role Script -->
-            <script>
-                var $roleId;
-                $(document).ready(function () {
-                    $('.deleterole').click(function (e) {
-                        e.preventDefault();
-                        var $row = $(this).closest("tr");
-                        $roleId = $row.attr('id');
-                        var $roleName = $row.find('.rolename').text();
-                        var $modal = $('#deleteRoleModal');
-                        $modal.find('.modal-body').html(function () {
-                            return "You are about delete the role <strong>" + $roleName + "</strong>."
-                                    + "<br><strong>Are you sure?</strong>";
-                        });
-                        $modal.modal({
-                            show: true
-                        });
-                    });
-                    $('#deleteRoleButton').click(function (e) {
-                        e.preventDefault();
-                        $.ajax({
-                            type: "POST",
-                            url: "manage/modify_role.php",
-                            data: {
-                                action: "delete",
-                                role: $roleId
-                            },
-                            success: function (data) {
-                                data = $.parseJSON(data);
-                                var $success = data.success;
-                                var $message = data.message;
-
-                                var $alert = $('#deleteAlert')
-                                $alert.removeClass("invisible");
-                                if ($success) {
-                                   $alert.removeClass("alert-danger");
-                                   $alert.addClass("alert-success");
-                                   $alert.find("#deleteAlertBody").html(function(){
-                                       return "<strong>Success!</strong> " + $message;
-                                   });
-                                } else {
-                                   $alert.removeClass("alert-success");
-                                   $alert.addClass("alert-danger");
-                                   $alert.find("#deleteAlertBody").html(function(){
-                                       return "<strong>Failure!</strong> " + $message;
-                                   });
-                                }
-                            }
-                        });
-                    });
-                });
-            </script>
 
             <!-- Delete Role Confirmation Modal -->
             <div class="modal fade" id="deleteRoleModal" tabindex="-1" role="dialog" aria-labelledby="deleteRoleModalLabel" aria-hidden="true">
