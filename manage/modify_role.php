@@ -11,12 +11,14 @@ if (!$userRole->HasPermission("manage_roles")) {
     header("Location: user-home.php");
 }
 
-$roleId = $_POST['role'];
+$role = $_POST['role'];
 $action = $_POST['action'];
 
 switch ($action){
     case 'delete':
-        return TryDeleteRole($roleId);
+        return TryDeleteRole($role);
+    case 'add':
+        return TryAddRole($role);
 }
 
 function TryDeleteRole($roleId){
@@ -34,4 +36,21 @@ function TryDeleteRole($roleId){
         echo json_encode($response);
         return TRUE;
     }
+}
+
+function TryAddRole($roleName){
+    $response = array();
+    if(Role::AnyRoleHasName($roleName)){
+        $response['success'] = FALSE;
+        $response['message'] = "Can't add role as a role with this name already exists";
+        echo json_encode($response);
+        return FALSE;
+    }
+    else{
+        Role::AddRoleWithName($roleName);
+        $response['success'] = TRUE;
+        $response['message'] = "Successfully added role";
+        echo json_encode($response);
+        return TRUE;
+    }  
 }

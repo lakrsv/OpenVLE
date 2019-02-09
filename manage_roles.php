@@ -105,10 +105,11 @@ if (!$userRole->HasPermission("manage_roles")) {
                             foreach ($allPermissions as $permission) {
                                 $hasPermission = $role->HasPermission($permission->GetName());
                                 $checked = $hasPermission ? "checked" : "";
+                                $disabled = $role->GetName() == "admin" ? "disabled" : "";
 
                                 echo '<td id=permission-' . $permission->GetId() . '>';
                                 echo '<div>';
-                                echo '<input type="checkbox" ' . $checked . '>';
+                                echo '<input type="checkbox" ' . $checked . ' ' . $disabled . ' class="permission-checkbox">';
                                 echo '</div>';
                                 echo '</td>';
                             }
@@ -149,12 +150,12 @@ if (!$userRole->HasPermission("manage_roles")) {
                                     var $success = data.success;
                                     var $message = data.message;
 
-                                    var $alert = $('#deleteAlert');
+                                    var $alert = $('#roleAlert');
                                     $alert.removeClass("invisible");
                                     if ($success) {
                                         $alert.removeClass("alert-danger");
                                         $alert.addClass("alert-success");
-                                        $alert.find("#deleteAlertBody").html(function () {
+                                        $alert.find("#roleAlertBody").html(function () {
                                             return "<strong>Success!</strong> " + $message;
                                         });
                                         $('#role-' + $roleId).remove();
@@ -162,8 +163,56 @@ if (!$userRole->HasPermission("manage_roles")) {
                                     } else {
                                         $alert.removeClass("alert-success");
                                         $alert.addClass("alert-danger");
-                                        $alert.find("#deleteAlertBody").html(function () {
-                                            return "<strong>Failure!</strong> " + $message;
+                                        $alert.find("#roleAlertBody").html(function () {
+                                            return "<strong>Error!</strong> " + $message;
+                                        });
+                                    }
+                                }
+                            });
+                        });
+                    });
+                </script>
+                <!-- Change Permissions Script -->
+                <script>
+                    $(document).ready(function () {
+                        $('.permission-checkbox').change(function () {
+                            var $checked = $(this).is(":checked");
+
+                            var $roleRow = $(this).closest("tr");
+                            var $roleId = $roleRow.attr('id').replace('role-', '');
+
+                            var $permissionRow = $(this).closest("td");
+                            var $permissionId = $permissionRow.attr('id').replace('permission-', '');
+
+                            var $action = $checked ? "add" : "remove";
+
+                            $.ajax({
+                                type: "POST",
+                                url: "manage/modify_permission.php",
+                                data: {
+                                    action: $action,
+                                    roleId: $roleId,
+                                    permissionId: $permissionId
+                                },
+                                success: function (data) {
+                                    data = $.parseJSON(data);
+                                    var $success = data.success;
+                                    var $message = data.message;
+
+                                    var $alert = $('#roleAlert');
+                                    $alert.removeClass("invisible");
+                                    if ($success) {
+                                        $alert.removeClass("alert-danger");
+                                        $alert.addClass("alert-success");
+                                        $alert.find("#roleAlertBody").html(function () {
+                                            return "<strong>Success!</strong> " + $message;
+                                        });
+
+                                    } else {
+                                        $alert.removeClass("alert-success");
+                                        $alert.addClass("alert-danger");
+                                        $alert.find("#roleAlertBody").html(function () {
+                                            return "<strong>Error!</strong> " + $message;
                                         });
                                     }
                                 }
@@ -173,9 +222,59 @@ if (!$userRole->HasPermission("manage_roles")) {
                 </script>
             </div>
 
+            <form>
+                <div class="form-group">
+                    <label for="newRole">Add a new role</label>
+                    <input type="text" class="form-control" id="newRole" placeholder="Enter role name">
+                </div>
+                <button id="newRoleButton" type="button" class="btn btn-primary">Add</button>
+            </form>
+
+            <!-- Add Role Script -->
+            <script>
+                $(document).ready(function () {
+                    $('#newRoleButton').click(function (e) {
+                        e.preventDefault();
+                        var $roleName = $('#newRole').val();
+                        $.ajax({
+                            type: "POST",
+                            url: "manage/modify_role.php",
+                            data: {
+                                action: "add",
+                                role: $roleName
+                            },
+                            success: function (data) {
+                                data = $.parseJSON(data);
+                                var $success = data.success;
+                                var $message = data.message;
+
+                                var $alert = $('#roleAlert');
+                                $alert.removeClass("invisible");
+                                if ($success) {
+                                    $alert.removeClass("alert-danger");
+                                    $alert.addClass("alert-success");
+                                    $alert.find("#roleAlertBody").html(function () {
+                                        return "<strong>Success!</strong> " + $message + ". <strong>Please refresh to see changes</strong>";
+                                    });
+
+                                } else {
+                                    $alert.removeClass("alert-success");
+                                    $alert.addClass("alert-danger");
+                                    $alert.find("#roleAlertBody").html(function () {
+                                        return "<strong>Error!</strong> " + $message;
+                                    });
+                                }
+                            }
+                        });
+                    });
+                });
+            </script>
+
+            <br>
+
             <!-- Alert Box -->
-            <div id ="deleteAlert" class="alert alert-danger show invisible" role="alert">
-                <div id="deleteAlertBody"></div>
+            <div id ="roleAlert" class="alert alert-danger show invisible" role="alert">
+                <div id="roleAlertBody"></div>
             </div>
 
             <!-- Delete Role Confirmation Modal -->

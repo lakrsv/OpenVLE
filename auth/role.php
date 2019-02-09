@@ -13,6 +13,24 @@ class Role {
         $this->name = $this->FetchRoleName($roleId);
         $this->permissions = $this->FetchPermissions($roleId);
     }
+    
+    public static function AddRoleWithname($roleName){
+        $connection = MysqlConfig::Connect();
+        $sql = "INSERT INTO Roles (name) VALUES (:name)";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("name", $roleName);
+        $statement->execute();
+    }
+    
+    public static function AnyRoleHasName($roleName){
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT id FROM Roles WHERE name = :name LIMIT 1";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("name", $roleName);
+        $statement->execute();
+        
+        return count($statement->fetchAll()) > 0 ? TRUE : FALSE;
+    }
 
     public static function AnyUserHasRoleWithId($roleId){
         $connection = MysqlConfig::Connect();
