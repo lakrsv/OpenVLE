@@ -4,6 +4,7 @@ require_once 'mysql_config.php';
 
 class User {
 
+    private $id;
     private $username;
     private $password;
 
@@ -12,6 +13,18 @@ class User {
             $this->username = stripslashes(strip_tags($data['username']));
             $this->password = stripslashes(strip_tags($data['password']));
         }
+    }
+
+    public function GetId() {
+        return $this->id;
+    }
+
+    public function GetName() {
+        return $this->username;
+    }
+
+    public function GetPassword() {
+        return $this->password;
     }
 
     public function Login() {
@@ -52,7 +65,63 @@ class User {
         return $statement;
     }
 
+    public static function GetAll() {
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT * FROM Users";
+        $statement = $connection->prepare($sql);
+        $statement->execute();
+
+        $users = array();
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $newUser = new User($row);
+            $newUser->id = $row['id'];
+            array_push($users, $newUser);
+        }
+
+        return $users;
+    }
+
+    public static function UserWithIdExists($userId) {
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT id FROM Users WHERE id = :userid LIMIT 1";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("userid", $userId);
+        $statement->execute();
+
+        return count($statement->fetchAll()) > 0 ? TRUE : FALSE;
+    }
+
+    public static function UserWithNameExists($userName) {
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT id FROM Users WHERE username = :username LIMIT 1";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("username", $userName);
+        $statement->execute();
+
+        return count($statement->fetchAll()) > 0 ? TRUE : FALSE;
+    }
+
+    public static function AddUserWithNameAndPassword($username, $password) {
+        $connection = MysqlConfig::Connect();
+        $password = password_hash($password, PASSWORD_DEFAULT);
+        $sql = "INSERT INTO Users (username, password) VALUES (:username, :password)";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("username", $username);
+        $statement->bindValue("password", $password);
+        $statement->execute();
+    }
+
+    public static function DeleteUserWithId($userId) {
+        $connection = MysqlConfig::Connect();
+        $sql = "DELETE FROM UserRoles WHERE userId = :userid;DELETE FROM Users WHERE id = :userid";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("userid", $userId, PDO::PARAM_STR);
+        $statement->execute();
+    }
+
 }
 
-$user = new User(["username" => $_POST['username'], "password" => $_POST['password']]);
-$user->Login();
+if (isset($_POST['username'], $_POST['password'])) {
+    $user = new User(["username" => $_POST['username'], "password" => $_POST['password']]);
+    $user->Login();
+}
