@@ -146,7 +146,7 @@ if (!$userRole->HasPermission("manage_users")) {
                                         $alert.find("#userAlertBody").html(function () {
                                             return "<strong>Success!</strong> " + $message;
                                         });
-                                        $('#role-' + $roleId).remove();
+                                        $('#user-' + $userId).remove();
 
                                     } else {
                                         $alert.removeClass("alert-success");
@@ -166,15 +166,16 @@ if (!$userRole->HasPermission("manage_users")) {
                     $(document).ready(function () {
                         $('.role-select').change(function () {
                             var $selected = $(this).find("option:selected");
-                            var valueSelected = $selected.val();
-
+                            var $roleName = $selected.val();
+                            var $userId = $(this).closest("tr").attr("id").replace("user-", "");
+                                                       
                             $.ajax({
                                 type: "POST",
                                 url: "manage/modify_user.php",
                                 data: {
-                                    action: $action,
-                                    roleId: $roleId,
-                                    permissionId: $permissionId
+                                    action: "change-role",
+                                    roleName: $roleName,
+                                    user: $userId
                                 },
                                 success: function (data) {
                                     data = $.parseJSON(data);
@@ -260,7 +261,7 @@ if (!$userRole->HasPermission("manage_users")) {
                 </div>
 
                 <!-- Delete User Confirmation Modal -->
-                <div class="modal fade" id="deleteRoleModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+                <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">

@@ -119,6 +119,24 @@ class User {
         $statement->execute();
     }
 
+    public static function ChangeUserRole($userId, $roleId) {
+        $connection = MysqlConfig::Connect();
+        $sql = "DELETE FROM UserRoles WHERE userId = :userid;INSERT INTO UserRoles (userId, roleId) VALUES (:userid, :roleid)";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("userid", $userId, PDO::PARAM_STR);
+        $statement->bindValue("roleid", $roleId, PDO::PARAM_STR);
+        $statement->execute();
+    }
+    
+    public static function GetUserIdFromName($userName){
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT id FROM Users WHERE username = :username LIMIT 1";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("username", $userName, PDO::PARAM_STR);
+        $statement->execute();
+
+        return $statement->fetchColumn();
+    }
 }
 
 if (isset($_POST['username'], $_POST['password'])) {
