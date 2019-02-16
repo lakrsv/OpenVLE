@@ -115,7 +115,7 @@ $userEmail = User::GetEmailFromId($userId);
                     } else if (file_exists($profilePictureFilepath2)) {
                         $realPicturePath = $profilePictureFilepath2;
                     }
-                    
+
                     if (isset($realPicturePath)) {
                         echo '<img src="' . $realPicturePath . '" class="img-fluid" alt="Profile Picture">';
                     }
