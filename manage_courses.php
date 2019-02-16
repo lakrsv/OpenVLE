@@ -75,8 +75,9 @@ if (!$userRole->HasPermission("manage_courses")) {
                             echo '<div class="col-8 coursename">';
                             echo $course->GetName();
                             echo '</div>';
-                            echo '<div class="col-4">';
-                            echo '<a class="far fa-times-circle pull-right text-danger no-decoration deletecourse" href="#"></a>';
+                            echo '<div class="col-4 text-right">';
+                            echo '<a class="far fa-edit text-dark no-decoration editcourse" href="#"></a>';
+                            echo '<a class="far fa-times-circle text-danger no-decoration deletecourse" href="#"></a>';
                             echo '</div>';
                             echo '</div>';
                             echo '</th>';
@@ -116,7 +117,6 @@ if (!$userRole->HasPermission("manage_courses")) {
                                     course: $courseId
                                 },
                                 success: function (data) {
-                                    alert(data);
                                     data = $.parseJSON(data);
                                     var $success = data.success;
                                     var $message = data.message;
@@ -169,7 +169,6 @@ if (!$userRole->HasPermission("manage_courses")) {
                                     description: $description
                                 },
                                 success: function (data) {
-                                    alert(data);
                                     data = $.parseJSON(data);
                                     var $success = data.success;
                                     var $message = data.message;
