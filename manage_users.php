@@ -59,7 +59,7 @@ if (!$userRole->HasPermission("manage_users")) {
             $allRoles = Role::GetAll();
             ?>
 
-            <div id="roleTable" class="table-responsive">
+            <div id="userTable" class="table-responsive">
                 <table class="table table-striped table-bordered">
                     <thead class="thead-dark">
                         <tr>
@@ -74,14 +74,14 @@ if (!$userRole->HasPermission("manage_users")) {
 
                             echo '<tr id=user-' . $user->GetId() . '>';
                             echo '<th scope="row">';
+                            echo '<div class="container">';
                             echo '<div class="row">';
-                            echo '<div class="col-8 username">';
+                            echo '<div class="col-10 username">';
                             echo $user->GetName();
                             echo '</div>';
-                            echo '<div class="col-4 text-right">';
-                            if ($userRole->GetName() != 'admin') {
-                                echo '<a class="far fa-edit text-dark no-decoration edituser" href="#"></a>';
-                            }
+                            echo '<div class="col-2 text-right">';
+                            echo '<a class="far fa-edit text-dark no-decoration edituser" href="#"></a>';
+                            echo '</div>';
                             echo '</div>';
                             echo '</div>';
                             echo '</th>';

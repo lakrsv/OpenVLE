@@ -44,7 +44,7 @@ class Role {
 
     public static function DeleteRoleWithId($roleId) {
         $connection = MysqlConfig::Connect();
-        $sql = "DELETE FROM RolePermissions WHERE roleId = :roleid;DELETE FROM Roles WHERE id = :roleid";
+        $sql = "DELETE FROM Roles WHERE id = :roleid";
         $statement = $connection->prepare($sql);
         $statement->bindValue("roleid", $roleId, PDO::PARAM_STR);
         $statement->execute();

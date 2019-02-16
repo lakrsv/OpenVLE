@@ -91,21 +91,23 @@ if (!$userRole->HasPermission("manage_roles")) {
                         foreach ($allRoles as $role) {
                             echo '<tr id=role-' . $role->GetId() . '>';
                             echo '<th scope="row">';
+                            echo '<div class="container">';
                             echo '<div class="row">';
-                            echo '<div class="col-8 rolename">';
+                            echo '<div class="col-10 rolename">';
                             echo $role->GetName();
                             echo '</div>';
+                            echo '<div class="col-2 text-right">';
                             if ($role->GetName() != "admin") {
-                                echo '<div class="col-4 text-right">';
-                                echo '<a class="far fa-edit text-dark no-decoration editrole" href="#"></a>';
-                                echo '</div>';
+                                echo '<a class="far fa-times-circle text-danger no-decoration deleterole" href="#"></a>';
                             }
+                            echo '</div>';
+                            echo '</div>';
                             echo '</div>';
                             echo '</th>';
                             foreach ($allPermissions as $permission) {
                                 $hasPermission = $role->HasPermission($permission->GetName());
                                 $checked = $hasPermission ? "checked" : "";
-                                $disabled = $role->GetName() == "admin" ? "disabled" : "";
+                                $disabled = $role->GetName() == "admin" || $permission->GetName() == "admin" ? "disabled" : "";
 
                                 echo '<td id=permission-' . $permission->GetId() . '>';
                                 echo '<div>';

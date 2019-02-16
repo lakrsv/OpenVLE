@@ -113,7 +113,7 @@ class User {
 
     public static function DeleteUserWithId($userId) {
         $connection = MysqlConfig::Connect();
-        $sql = "DELETE FROM UserRoles WHERE userId = :userid;DELETE FROM Users WHERE id = :userid";
+        $sql = "DELETE FROM Users WHERE id = :userid";
         $statement = $connection->prepare($sql);
         $statement->bindValue("userid", $userId, PDO::PARAM_STR);
         $statement->execute();

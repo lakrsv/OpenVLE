@@ -58,7 +58,7 @@ if (!$userRole->HasPermission("manage_courses")) {
             $allCourses = Course::GetAll();
             ?>
 
-            <div id="roleTable" class="table-responsive">
+            <div id="courseTable" class="table-responsive">
                 <table class="table table-striped table-bordered">
                     <thead class="thead-dark">
                         <tr>
@@ -71,12 +71,14 @@ if (!$userRole->HasPermission("manage_courses")) {
                         foreach ($allCourses as $course) {
                             echo '<tr id=course-' . $course->GetId() . '>';
                             echo '<th scope="row">';
+                            echo '<div class="container">';
                             echo '<div class="row">';
-                            echo '<div class="col-8 coursename">';
+                            echo '<div class="col-10 coursename">';
                             echo $course->GetName();
                             echo '</div>';
-                            echo '<div class="col-4 text-right">';
+                            echo '<div class="col-2 text-right">';
                             echo '<a class="far fa-edit text-dark no-decoration editcourse" href="#"></a>';
+                            echo '</div>';
                             echo '</div>';
                             echo '</div>';
                             echo '</th>';
