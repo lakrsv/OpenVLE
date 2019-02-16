@@ -101,6 +101,7 @@ if (!$userRole->HasPermission("manage_users")) {
                             }
                             echo '</select>';
                             echo '</div>';
+                            echo '</td>';
                             echo '</tr>';
                         }
                         ?>
@@ -207,10 +208,10 @@ if (!$userRole->HasPermission("manage_users")) {
                 <form>
                     <div class="form-group">
                         <label for="username">Add a new user</label>
-                        <input type="email" class="form-control" id="username" placeholder="Enter username">
-                        <input type="password" class="form-control" id="password" placeholder="Enter password">
+                        <input type="email" class="form-control" id="username" placeholder="Enter username" name="username" autocomplete="email">
+                        <input type="password" class="form-control" id="password" placeholder="Enter password" name="password" autocomplete="new-password">
                     </div>
-                    <button id="addUserButton" type="button" class="btn btn-primary">Add</button>
+                    <button id="addUserButton" type="submit" class="btn btn-primary">Add</button>
                 </form>
 
                 <!-- Add Role Script -->
@@ -239,7 +240,7 @@ if (!$userRole->HasPermission("manage_users")) {
                                         $alert.removeClass("alert-danger");
                                         $alert.addClass("alert-success");
                                         $alert.find("#userAlertBody").html(function () {
-                                            return "<strong>Success!</strong> " + $message + ". <strong>Please refresh to see changes</strong>";
+                                            return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'><strong>Please refresh to see changes</strong></a>";
                                         });
 
                                     } else {
