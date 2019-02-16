@@ -76,11 +76,11 @@ if (!$userRole->HasPermission("manage_users")) {
                             echo '<th scope="row">';
                             echo '<div class="container">';
                             echo '<div class="row">';
-                            echo '<div class="col-10 username">';
-                            echo $user->GetName();
+                            echo '<div class="col-10 email">';
+                            echo $user->GetEmail();
                             echo '</div>';
                             echo '<div class="col-2 text-right">';
-                            echo '<a class="far fa-edit text-dark no-decoration edituser" href="#"></a>';
+                            echo '<a class="far fa-edit text-dark no-decoration edituser" href="edit_user.php?id='.$user->GetId().'"></a>';
                             echo '</div>';
                             echo '</div>';
                             echo '</div>';
@@ -115,10 +115,10 @@ if (!$userRole->HasPermission("manage_users")) {
                             e.preventDefault();
                             var $row = $(this).closest("tr");
                             $userId = $row.attr('id').replace('user-', '');
-                            var $userName = $row.find('.username').text();
+                            var $email = $row.find('.email').text();
                             var $modal = $('#deleteUserModal');
                             $modal.find('.modal-body').html(function () {
-                                return "You are about delete the user <strong>" + $userName + "</strong>."
+                                return "You are about delete the user <strong>" + $email + "</strong>."
                                         + "<br><strong>Are you sure?</strong>";
                             });
                             $modal.modal({
@@ -183,19 +183,19 @@ if (!$userRole->HasPermission("manage_users")) {
                                     var $success = data.success;
                                     var $message = data.message;
 
-                                    var $alert = $('#roleAlert');
+                                    var $alert = $('#userAlert');
                                     $alert.removeClass("invisible");
                                     if ($success) {
                                         $alert.removeClass("alert-danger");
                                         $alert.addClass("alert-success");
-                                        $alert.find("#roleAlertBody").html(function () {
+                                        $alert.find("#userAlertBody").html(function () {
                                             return "<strong>Success!</strong> " + $message;
                                         });
 
                                     } else {
                                         $alert.removeClass("alert-success");
                                         $alert.addClass("alert-danger");
-                                        $alert.find("#roleAlertBody").html(function () {
+                                        $alert.find("#userAlertBody").html(function () {
                                             return "<strong>Error!</strong> " + $message;
                                         });
                                     }
@@ -207,26 +207,30 @@ if (!$userRole->HasPermission("manage_users")) {
 
                 <form>
                     <div class="form-group">
-                        <label for="username">Add a new user</label>
-                        <input type="email" class="form-control" id="username" placeholder="Enter username" name="username" autocomplete="email">
+                        <label for="email">Add a new user</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" autocomplete="email">
+                        <input type="text" class="form-control" id="username" placeholder="Enter username" name="username" autocomplete="off">
                         <input type="password" class="form-control" id="password" placeholder="Enter password" name="password" autocomplete="new-password">
                     </div>
                     <button id="addUserButton" type="submit" class="btn btn-primary">Add</button>
                 </form>
 
-                <!-- Add Role Script -->
+                <!-- Add User Script -->
                 <script>
                     $(document).ready(function () {
                         $('#addUserButton').click(function (e) {
                             e.preventDefault();
+                            var $email = $('#email').val();
                             var $username = $('#username').val();
                             var $password = $('#password').val()
+                            
                             $.ajax({
                                 type: "POST",
                                 url: "manage/modify_user.php",
                                 data: {
                                     action: "add",
-                                    user: $username,
+                                    user: $email,
+                                    name: $username,
                                     password: $password
                                 },
                                 success: function (data) {

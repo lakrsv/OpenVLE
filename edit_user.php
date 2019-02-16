@@ -1,8 +1,16 @@
 <?php
+require_once 'header/auth_header.php';
+require_once 'auth/login.php';
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+// TODO - Change this to allow user to change their profile
+if (!$userRole->HasPermission("manage_users")) {
+    header("Location: user-home.php");
+}
 
+if(!isset($_GET['id'])){
+    exit("Get params not set");
+}
+
+$userId = $_GET['id'];
+echo "Welcome ". User::GetUserNameFromId($userId) ."!";
+?>

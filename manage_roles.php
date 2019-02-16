@@ -229,7 +229,7 @@ if (!$userRole->HasPermission("manage_roles")) {
                     <label for="newRole">Add a new role</label>
                     <input type="text" class="form-control" id="newRole" placeholder="Enter role name">
                 </div>
-                <button id="newRoleButton" type="button" class="btn btn-primary">Add</button>
+                <button id="newRoleButton" type="submit" class="btn btn-primary">Add</button>
             </form>
 
             <!-- Add Role Script -->
@@ -294,7 +294,7 @@ if (!$userRole->HasPermission("manage_roles")) {
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                            <button id="deleteRoleButton" type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                            <button id="deleteRoleButton" type="submit" class="btn btn-primary" data-dismiss="modal">Yes</button>
                         </div>
                     </div>
                 </div>

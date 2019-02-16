@@ -85,6 +85,7 @@ class Course {
         $connection = MysqlConfig::Connect();
         $sql = "SELECT * FROM Courses WHERE name = :name LIMIT 1;";
         $statement = $connection->prepare($sql);
+        $statement->bindValue("name", $name, PDO::PARAM_STR);
         $statement->execute();
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);

@@ -35,8 +35,8 @@
                     <div class="row justify-content-center">
                         <form id="login" method="post">
                             <div class="form-group">
-                                <label for="username">Email Address</label>
-                                <input type="email" class="form-control" id="username" placeholder="Enter email">
+                                <label for="email">Email Address</label>
+                                <input type="email" class="form-control" id="email" placeholder="Enter email">
                             </div>
                             <div class="form-group">
                                 <label for="password">Password</label>
@@ -53,14 +53,14 @@
                                         type: "POST",
                                         url: "auth/login.php",
                                         data: {
-                                            username: $('#username').val(),
+                                            email: $('#email').val(),
                                             password: $('#password').val()
                                         },
                                         success: function (data) {
                                             if (data === "Success") {
                                                 window.location = 'user_home.php';
                                             } else {
-                                                alert("Invalid Username/Password");
+                                                alert("Invalid Email/Password");
                                             }
                                         }
                                     });

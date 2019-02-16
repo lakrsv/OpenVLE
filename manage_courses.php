@@ -77,7 +77,7 @@ if (!$userRole->HasPermission("manage_courses")) {
                             echo $course->GetName();
                             echo '</div>';
                             echo '<div class="col-2 text-right">';
-                            echo '<a class="far fa-edit text-dark no-decoration editcourse" href="#"></a>';
+                            echo '<a class="far fa-edit text-dark no-decoration editcourse" href="edit_course.php?id='.$course->GetId().'"></a>';
                             echo '</div>';
                             echo '</div>';
                             echo '</div>';
@@ -216,7 +216,7 @@ if (!$userRole->HasPermission("manage_courses")) {
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                                <button id="deleteCourseButton" type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                                <button id="deleteCourseButton" type="submit" class="btn btn-primary" data-dismiss="modal">Yes</button>
                             </div>
                         </div>
                     </div>

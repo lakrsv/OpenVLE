@@ -20,12 +20,12 @@ switch ($action) {
     case 'delete':
         return TryDeleteUser($user);
     case 'add':
-        // Get password from POST
-        if (!isset($_POST['password'])) {
-            exit("Password not set");
+        if (!isset($_POST['password'], $_POST['name'])) {
+            exit("Post params not set");
         }
         $password = $_POST['password'];
-        return TryAddUser($user, $password);
+        $userName = $_POST['name'];
+        return TryAddUser($user, $userName, $password);
     case 'change-role':
         if (!isset($_POST["roleName"])) {
             exit("roleName not set");
@@ -50,7 +50,7 @@ function TryDeleteUser($userId) {
     }
 }
 
-function TryAddUser($userName, $password) {
+function TryAddUser($email, $name, $password) {
     $response = array();
 
     if (strlen($password) < 6) {
@@ -60,14 +60,14 @@ function TryAddUser($userName, $password) {
         return FALSE;
     }
 
-    if (User::UserWithNameExists($userName)) {
+    if (User::UserWithEmailExists($email)) {
         $response['success'] = FALSE;
-        $response['message'] = "Can't add user as a user with this name already exists";
+        $response['message'] = "Can't add user as a user with this email already exists";
         echo json_encode($response);
         return FALSE;
     } else {
-        User::AddUserWithNameAndPassword($userName, $password);
-        $userId = User::GetUserIdFromName($userName);
+        User::AddUserWithEmailAndNameAndPassword($email, $name, $password);
+        $userId = User::GetUserIdFromEmail($email);
         User::ChangeUserRole($userId, Role::GetRoleIdFromRoleName("learner"));
         
         $response['success'] = TRUE;

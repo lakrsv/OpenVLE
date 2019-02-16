@@ -5,12 +5,13 @@ require_once 'mysql_config.php';
 class User {
 
     private $id;
-    private $username;
+    private $email;
+    private $name;
     private $password;
 
     public function __construct($data = array()) {
-        if (isset($data['username'], $data['password'])) {
-            $this->username = stripslashes(strip_tags($data['username']));
+        if (isset($data['email'], $data['password'])) {
+            $this->email = stripslashes(strip_tags($data['email']));
             $this->password = stripslashes(strip_tags($data['password']));
         }
     }
@@ -19,8 +20,12 @@ class User {
         return $this->id;
     }
 
+    public function GetEmail(){
+        return $this->email;
+    }
+    
     public function GetName() {
-        return $this->username;
+        return $this->name;
     }
 
     public function GetPassword() {
@@ -43,7 +48,8 @@ class User {
                     session_start();
                     session_regenerate_id();
 
-                    $_SESSION['username'] = $this->username;
+                    $_SESSION['username'] = $this->name;
+                    $_SESSION['useremail'] = $this->email;
                     $_SESSION['userid'] = $result['id'];
 
                     session_write_close();
@@ -59,9 +65,9 @@ class User {
     }
 
     private function CreateLoginStatement($connection) {
-        $sql = "SELECT * FROM Users WHERE username = :username LIMIT 1";
+        $sql = "SELECT * FROM Users WHERE email = :email LIMIT 1";
         $statement = $connection->prepare($sql);
-        $statement->bindValue("username", $this->username, PDO::PARAM_STR);
+        $statement->bindValue("email", $this->email, PDO::PARAM_STR);
         return $statement;
     }
 
@@ -75,6 +81,7 @@ class User {
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $newUser = new User($row);
             $newUser->id = $row['id'];
+            $newUser->name = $row['name'];
             array_push($users, $newUser);
         }
 
@@ -91,22 +98,23 @@ class User {
         return count($statement->fetchAll()) > 0 ? TRUE : FALSE;
     }
 
-    public static function UserWithNameExists($userName) {
+    public static function UserWithEmailExists($email) {
         $connection = MysqlConfig::Connect();
-        $sql = "SELECT id FROM Users WHERE username = :username LIMIT 1";
+        $sql = "SELECT id FROM Users WHERE email = :email LIMIT 1";
         $statement = $connection->prepare($sql);
-        $statement->bindValue("username", $userName);
+        $statement->bindValue("email", $email);
         $statement->execute();
 
         return count($statement->fetchAll()) > 0 ? TRUE : FALSE;
     }
 
-    public static function AddUserWithNameAndPassword($username, $password) {
+    public static function AddUserWithEmailAndNameAndPassword($email, $name, $password) {
         $connection = MysqlConfig::Connect();
         $password = password_hash($password, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO Users (username, password) VALUES (:username, :password)";
+        $sql = "INSERT INTO Users (email, name, password) VALUES (:email, :name, :password)";
         $statement = $connection->prepare($sql);
-        $statement->bindValue("username", $username);
+        $statement->bindValue("email", $email);
+        $statement->bindValue("name", $name);
         $statement->bindValue("password", $password);
         $statement->execute();
     }
@@ -128,18 +136,38 @@ class User {
         $statement->execute();
     }
     
-    public static function GetUserIdFromName($userName){
+    public static function GetUserIdFromEmail($email){
         $connection = MysqlConfig::Connect();
-        $sql = "SELECT id FROM Users WHERE username = :username LIMIT 1";
+        $sql = "SELECT id FROM Users WHERE email = :email LIMIT 1";
         $statement = $connection->prepare($sql);
-        $statement->bindValue("username", $userName, PDO::PARAM_STR);
+        $statement->bindValue("email", $email, PDO::PARAM_STR);
+        $statement->execute();
+
+        return $statement->fetchColumn();
+    }
+    
+    public static function GetEmailFromId($userId){
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT email FROM Users WHERE id = :id LIMIT 1";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("id", $userId, PDO::PARAM_STR);
+        $statement->execute();
+
+        return $statement->fetchColumn();
+    }
+    
+    public static function GetUsernameFromId($userId){
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT name FROM Users WHERE id = :id LIMIT 1";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("id", $userId, PDO::PARAM_STR);
         $statement->execute();
 
         return $statement->fetchColumn();
     }
 }
 
-if (isset($_POST['username'], $_POST['password'])) {
-    $user = new User(["username" => $_POST['username'], "password" => $_POST['password']]);
+if (isset($_POST['email'], $_POST['password'])) {
+    $user = new User(["email" => $_POST['email'], "password" => $_POST['password']]);
     $user->Login();
 }
