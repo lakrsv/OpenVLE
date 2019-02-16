@@ -60,7 +60,6 @@ function TryUploadImage($userId) {
     if (move_uploaded_file($file["tmp_name"], $uploadPath)) {
         $response['success'] = TRUE;
         $response['message'] = "Image successfully uploaded!";
-
         echo json_encode($response);
         return TRUE;
     } else {

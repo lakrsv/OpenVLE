@@ -76,10 +76,10 @@ $userEmail = User::GetEmailFromId($userId);
         <div class="container-fluid mt-2">
             <div class="row">
                 <div class="col-lg-4">
-                    <div class="col-12 mb-3 py-2 bg-dark text-white">
+                    <div class="col-12 mb-2 py-2 bg-dark text-white">
                         Edit User
                     </div>
-                    <div class="input-group mb-3">
+                    <div class="input-group mb-2">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="email-addon">E-mail</span>
                         </div>
@@ -87,7 +87,7 @@ $userEmail = User::GetEmailFromId($userId);
                         echo '<input type="text" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="email-addon" value="' . $userEmail . '" readonly>'
                         ?>                    
                     </div>
-                    <div class="input-group mb-3">
+                    <div class="input-group mb-2">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="name-addon">Name</span>
                         </div>
@@ -99,9 +99,6 @@ $userEmail = User::GetEmailFromId($userId);
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" id="picture-upload">
                             <label class="custom-file-label" for="picture-upload" aria-describedby="picture-upload-button" id="profile-label">Choose profile picture</label>
-                        </div>
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="submit" id="picture-upload-button">Upload</button>
                         </div>
                     </div>
                     <small class="form-text text-muted mb-3">(PNG, JPG) Max: 2 MB</small>
@@ -117,18 +114,24 @@ $userEmail = User::GetEmailFromId($userId);
                     }
 
                     if (isset($realPicturePath)) {
-                        echo '<img src="' . $realPicturePath . '" class="img-fluid" alt="Profile Picture">';
+                        echo '<img src="' . $realPicturePath . '?'. filemtime($realPicturePath) .'" class="img-fluid" alt="Profile Picture">';
                     }
                     ?>
+
+                    <div class="row mt-2">
+                        <div class="col-12 text-left">
+                            <a class="btn btn-primary" href="#" id="save-changes-button">Save Changes</a>
+                            <a class="btn btn-secondary" href="manage_users.php">Back</a>
+                        </div>
+                    </div>
+
+                    <!-- Alert Box -->
+                    <div id ="editAlert" class="alert alert-danger show invisible mt-2" role="alert">
+                        <div id="editAlertBody"></div>
+                    </div>
                 </div>
 
 
-            </div>
-            <div class="row mt-3">
-                <div class="col-12 text-left">
-                    <a class="btn btn-primary" href="#">Save Changes</a>
-                    <a class="btn btn-secondary" href="manage_users.php">Back</a>
-                </div>
             </div>
         </div>
 
@@ -142,27 +145,47 @@ $userEmail = User::GetEmailFromId($userId);
                     var fileName = selectedFile.name;
                     $('#profile-label').text(fileName);
                 });
-                $('#picture-upload-button').click(function (e) {
+                $('#save-changes-button').click(function (e) {
                     e.preventDefault();
-                    var formData = new FormData();
-                    var userId = $('#userid').text();
-                    formData.append('action', 'upload_image');
-                    formData.append('userid', userId);
-                    formData.append('file', selectedFile);
-                    $.ajax({
-                        type: "POST",
-                        url: "manage/modify_profile.php",
-                        cache: false,
-                        contentType: false,
-                        processData: false,
-                        data: formData,
-                        success: function (data) {
-                            alert(data);
-                            data = $.parseJSON(data);
-                            var $success = data.success;
-                            var $message = data.message;
-                        }
-                    });
+
+                    // Set new profile picture
+                    if (selectedFile) {
+                        var formData = new FormData();
+                        var userId = $('#userid').text();
+                        formData.append('action', 'upload_image');
+                        formData.append('userid', userId);
+                        formData.append('file', selectedFile);
+                        $.ajax({
+                            type: "POST",
+                            url: "manage/modify_profile.php",
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            data: formData,
+                            success: function (data) {
+                                data = $.parseJSON(data);
+                                var $success = data.success;
+                                var $message = data.message;
+
+                                var $alert = $('#editAlert');
+                                $alert.removeClass("invisible");
+                                if ($success) {
+                                    $alert.removeClass("alert-danger");
+                                    $alert.addClass("alert-success");
+                                    $alert.find("#editAlertBody").html(function () {
+                                        return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'><strong>Please refresh to see changes</strong></a>";
+                                    });
+
+                                } else {
+                                    $alert.removeClass("alert-success");
+                                    $alert.addClass("alert-danger");
+                                    $alert.find("#editAlertBody").html(function () {
+                                        return "<strong>Error!</strong> " + $message;
+                                    });
+                                }
+                            }
+                        });
+                    }
                 });
             });
         </script>
