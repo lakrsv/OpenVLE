@@ -98,7 +98,6 @@ if (!$userRole->HasPermission("manage_roles")) {
                             if ($role->GetName() != "admin") {
                                 echo '<div class="col-4 text-right">';
                                 echo '<a class="far fa-edit text-dark no-decoration editrole" href="#"></a>';
-                                echo '<a class="far fa-times-circle text-danger no-decoration deleterole" href="#"></a>';
                                 echo '</div>';
                             }
                             echo '</div>';

@@ -77,7 +77,6 @@ if (!$userRole->HasPermission("manage_courses")) {
                             echo '</div>';
                             echo '<div class="col-4 text-right">';
                             echo '<a class="far fa-edit text-dark no-decoration editcourse" href="#"></a>';
-                            echo '<a class="far fa-times-circle text-danger no-decoration deletecourse" href="#"></a>';
                             echo '</div>';
                             echo '</div>';
                             echo '</th>';
