@@ -61,8 +61,8 @@ $userEmail = User::GetEmailFromId($userId);
 
         <script>
             $(function () {
-                $('[data-toggle="tooltip"]').tooltip()
-            })
+                $('[data-toggle="tooltip"]').tooltip();
+            });
         </script>
 
         <nav class="navbar navbar-expand-md navbar-dark bg-dark static-top">
