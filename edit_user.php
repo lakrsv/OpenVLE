@@ -77,7 +77,7 @@ $userEmail = User::GetEmailFromId($userId);
             <div class="row">
                 <div class="col-lg-4">
                     <div class="col-12 mb-2 py-2 bg-dark text-white">
-                        Edit User
+                        Edit User Profile
                     </div>
                     <div class="input-group mb-2">
                         <div class="input-group-prepend">
@@ -120,8 +120,8 @@ $userEmail = User::GetEmailFromId($userId);
 
                     <div class="row mt-2">
                         <div class="col-12 text-left">
-                            <a class="btn btn-primary" href="#" id="save-changes-button">Save Changes</a>
                             <a class="btn btn-secondary" href="manage_users.php">Back</a>
+                            <a class="btn btn-primary" href="#" id="save-changes-button">Save Changes</a>
                         </div>
                     </div>
 

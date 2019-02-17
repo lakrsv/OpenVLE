@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../auth/mysql_config.php';
 require_once __DIR__ . '/../auth/role.php';
 require_once __DIR__ . '/../header/auth_header.php';
-require_once __DIR__.'/../auth/login.php';
+require_once __DIR__ . '/../auth/login.php';
 
 if (!$userRole->HasPermission("manage_profile")) {
     header("Location: user-home.php");
@@ -81,11 +81,13 @@ function TryChangePicture($userId) {
     if (move_uploaded_file($file["tmp_name"], $uploadPath)) {
         $response['success'] = TRUE;
         $response['message'] = "Image successfully uploaded!";
+
         return $response;
     } else {
         $response['success'] = FALSE;
         $response['message'] = "An error occured while trying to upload the image";
         echo json_encode($response);
+
         return $response;
     }
 }
@@ -115,6 +117,6 @@ function HasFile() {
     return FALSE;
 }
 
-function IsValidName($name){
+function IsValidName($name) {
     return preg_match("/^[a-zA-Z'-]+$/", $name);
 }
