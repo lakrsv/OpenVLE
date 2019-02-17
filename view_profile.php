@@ -66,26 +66,29 @@ $userEmail = User::GetEmailFromId($userId);
             });
         </script>
 
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark static-top">
-            <a class="navbar-brand" href="#">OpenVLE Admin</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapse" aria-controls="collapse" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="collapse">
-                <ul class="navbar-nav mr-auto px-2">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="manage_users.php">Manage Users</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="manage_courses.php">Manage Courses</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="manage_roles.php">Manage Roles</a>
-                    </li>
-                </ul>
-                <a id="logout" class="btn btn-outline-danger pull-right my-2 my-sm-0" href="auth/log_out.php">Log Out</a>
-            </div>
-        </nav>
+        <?php if ($canManageUsers) { ?>
+            <nav class="navbar navbar-expand-md navbar-dark bg-dark static-top">
+                <a class="navbar-brand" href="#">OpenVLE Admin</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapse" aria-controls="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="collapse">
+                    <ul class="navbar-nav mr-auto px-2">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="manage_users.php">Manage Users</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="manage_courses.php">Manage Courses</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="manage_roles.php">Manage Roles</a>
+                        </li>
+                    </ul>
+                    <a id="logout" class="btn btn-outline-danger pull-right my-2 my-sm-0" href="auth/log_out.php">Log Out</a>
+                </div>
+            </nav>
+        <?php } else { ?>
+        <?php } ?>
 
         <?php
         echo '<div id="userid" style="display: none;">' . $userId . '</div>'
@@ -189,18 +192,18 @@ $userEmail = User::GetEmailFromId($userId);
                                 echo '<input type="text" class="form-control" id="phoneNumber" ' . $number . '>';
                                 ?>
                             </div>
-
-                            <?php if ($canManageProfile) { ?>
-                            <?php } ?>
                         </div>
 
                         <div class="row mt-2">
                             <div class="col-12 text-left">
-                                <a class="btn btn-secondary" href="manage_users.php">Back</a>
+                                <a class="btn btn-secondary" href="javascript:history.go(-1)">Back</a>
                                 <?php if ($canManageProfile) { ?>
                                     <a class="btn btn-primary" href="#" id="save-changes-button">Save Changes</a>
                                 <?php } ?>
-                            </div>
+                                <?php if ($canManageProfile && !Role::GetRoleFromUserId($userId)->HasPermission("admin")) { ?>
+                                    <a class="btn btn-danger" href="#" id="delete-user-button">Delete User</a>
+                                <?php } ?>
+                            </div>                         
                         </div>
                     </div>
 
@@ -248,6 +251,7 @@ $userEmail = User::GetEmailFromId($userId);
                         <script>
                             var courseId;
                             var userId;
+                            var action;
                             $(document).ready(function () {
                                 $('.unassigncourse').click(function (e) {
                                     e.preventDefault();
@@ -260,22 +264,25 @@ $userEmail = User::GetEmailFromId($userId);
                                         return "You are about unassign this course."
                                                 + "<br><strong>Are you sure?</strong>";
                                     });
+                                    action = "unassign-course";
                                     $modal.modal({
                                         show: true
                                     });
                                 });
                                 $('#modalConfirmButton').click(function (e) {
                                     e.preventDefault();
+                                    if (action !== "unassign-course") {
+                                        return;
+                                    }
                                     $.ajax({
                                         type: "POST",
                                         url: "manage/modify_user.php",
                                         data: {
-                                            action: "unassign-course",
+                                            action: action,
                                             user: userId,
                                             course: courseId
                                         },
                                         success: function (data) {
-                                            alert(data);
                                             data = $.parseJSON(data);
                                             var $success = data.success;
                                             var $message = data.message;
@@ -290,6 +297,56 @@ $userEmail = User::GetEmailFromId($userId);
                                                 });
                                                 $('#course-' + courseId).remove();
 
+                                            } else {
+                                                $alert.removeClass("alert-success");
+                                                $alert.addClass("alert-danger");
+                                                $alert.find("#courseAlertBody").html(function () {
+                                                    return "<strong>Error!</strong> " + $message;
+                                                });
+                                            }
+                                        }
+                                    });
+                                });
+                                $('#delete-user-button').click(function (e) {
+                                    e.preventDefault();
+
+                                    userId = $('#userid').text();
+
+                                    var $modal = $('#profileModal');
+                                    $modal.find('.modal-body').html(function () {
+                                        return "You are about delete this user."
+                                                + "<br><strong>Are you sure?</strong>";
+                                    });
+                                    action = "delete";
+                                    $modal.modal({
+                                        show: true
+                                    });
+                                });
+                                $('#modalConfirmButton').click(function (e) {
+                                    e.preventDefault();
+                                    if (action !== "delete") {
+                                        return;
+                                    }
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "manage/modify_user.php",
+                                        data: {
+                                            action: action,
+                                            user: userId
+                                        },
+                                        success: function (data) {
+                                            data = $.parseJSON(data);
+                                            var $success = data.success;
+                                            var $message = data.message;
+
+                                            var $alert = $('#courseAlert');
+                                            $alert.removeClass("invisible");
+                                            if ($success) {
+                                                $alert.removeClass("alert-danger");
+                                                $alert.addClass("alert-success");
+                                                $alert.find("#courseAlertBody").html(function () {
+                                                    return "<strong>Success!</strong> " + $message + ". <a href='manage_users.php' class='alert-link'>Go to manage users</a>";
+                                                });
                                             } else {
                                                 $alert.removeClass("alert-success");
                                                 $alert.addClass("alert-danger");
@@ -379,7 +436,7 @@ $userEmail = User::GetEmailFromId($userId);
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="profileModalLabel">Delete Role</h5>
+                        <h5 class="modal-title" id="profileModalLabel">Are you sure?</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -439,7 +496,6 @@ $userEmail = User::GetEmailFromId($userId);
                             processData: false,
                             data: formData,
                             success: function (data) {
-                                alert(data);
                                 data = $.parseJSON(data);
                                 var $success = data.success;
                                 var $message = data.message;
