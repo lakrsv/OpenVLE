@@ -92,7 +92,7 @@ $userEmail = User::GetEmailFromId($userId);
                             <span class="input-group-text" id="name-addon">Name</span>
                         </div>
                         <?php
-                        echo '<input type="text" class="form-control" placeholder="Name" aria-label="Name" aria-describedby="name-addon" value="' . $userName . '">'
+                        echo '<input type="text" id="new-name" class="form-control" placeholder="Name" aria-label="Name" aria-describedby="name-addon" value="' . $userName . '">'
                         ?>
                     </div>
                     <div class="input-group">
@@ -114,7 +114,7 @@ $userEmail = User::GetEmailFromId($userId);
                     }
 
                     if (isset($realPicturePath)) {
-                        echo '<img src="' . $realPicturePath . '?'. filemtime($realPicturePath) .'" class="img-fluid" alt="Profile Picture">';
+                        echo '<img src="' . $realPicturePath . '?' . filemtime($realPicturePath) . '" class="img-fluid" alt="Profile Picture">';
                     }
                     ?>
 
@@ -145,47 +145,50 @@ $userEmail = User::GetEmailFromId($userId);
                     var fileName = selectedFile.name;
                     $('#profile-label').text(fileName);
                 });
+
                 $('#save-changes-button').click(function (e) {
                     e.preventDefault();
 
-                    // Set new profile picture
+                    var formData = new FormData();
+                    var userId = $('#userid').text();
+                    var userName = $('#new-name').val();
+                    formData.append('name', userName);
+                    formData.append('userid', userId);
+
                     if (selectedFile) {
-                        var formData = new FormData();
-                        var userId = $('#userid').text();
-                        formData.append('action', 'upload_image');
-                        formData.append('userid', userId);
                         formData.append('file', selectedFile);
-                        $.ajax({
-                            type: "POST",
-                            url: "manage/modify_profile.php",
-                            cache: false,
-                            contentType: false,
-                            processData: false,
-                            data: formData,
-                            success: function (data) {
-                                data = $.parseJSON(data);
-                                var $success = data.success;
-                                var $message = data.message;
-
-                                var $alert = $('#editAlert');
-                                $alert.removeClass("invisible");
-                                if ($success) {
-                                    $alert.removeClass("alert-danger");
-                                    $alert.addClass("alert-success");
-                                    $alert.find("#editAlertBody").html(function () {
-                                        return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'><strong>Please refresh to see changes</strong></a>";
-                                    });
-
-                                } else {
-                                    $alert.removeClass("alert-success");
-                                    $alert.addClass("alert-danger");
-                                    $alert.find("#editAlertBody").html(function () {
-                                        return "<strong>Error!</strong> " + $message;
-                                    });
-                                }
-                            }
-                        });
                     }
+
+                    $.ajax({
+                        type: "POST",
+                        url: "manage/modify_profile.php",
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        data: formData,
+                        success: function (data) {
+                            data = $.parseJSON(data);
+                            var $success = data.success;
+                            var $message = data.message;
+
+                            var $alert = $('#editAlert');
+                            $alert.removeClass("invisible");
+                            if ($success) {
+                                $alert.removeClass("alert-danger");
+                                $alert.addClass("alert-success");
+                                $alert.find("#editAlertBody").html(function () {
+                                    return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'><strong>Please refresh to see changes</strong></a>";
+                                });
+
+                            } else {
+                                $alert.removeClass("alert-success");
+                                $alert.addClass("alert-danger");
+                                $alert.find("#editAlertBody").html(function () {
+                                    return "<strong>Error!</strong> " + $message;
+                                });
+                            }
+                        }
+                    });
                 });
             });
         </script>

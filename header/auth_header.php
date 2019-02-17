@@ -6,7 +6,9 @@ if(session_status() == PHP_SESSION_NONE){
 }
 
 if (!isset($_SESSION['userid'])) {
+    session_destroy();
     header("Location: index.php");
+    die();
 }
 
 $userRole = Role::GetRoleFromUserId($_SESSION['userid']);

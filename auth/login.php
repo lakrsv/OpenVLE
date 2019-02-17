@@ -136,6 +136,15 @@ class User {
         $statement->execute();
     }
     
+    public static function ChangeUserName($userId, $newName){
+        $connection = MysqlConfig::Connect();
+        $sql = "UPDATE Users SET name=:name WHERE id=:userid";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("name", $newName, PDO::PARAM_STR);
+        $statement->bindValue("userid", $userId, PDO::PARAM_STR);
+        $statement->execute();
+    }
+    
     public static function GetUserIdFromEmail($email){
         $connection = MysqlConfig::Connect();
         $sql = "SELECT id FROM Users WHERE email = :email LIMIT 1";
