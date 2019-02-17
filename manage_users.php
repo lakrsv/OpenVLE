@@ -87,7 +87,7 @@ if (!$userRole->HasPermission("manage_users")) {
                             echo $user->GetEmail();
                             echo '</div>';
                             echo '<div class="col-2 text-right">';
-                            echo '<a class="far fa-edit text-dark no-decoration edituser" href="edit_user.php?id=' . $user->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Edit user profile"></a>';
+                            echo '<a class="far fa-edit text-dark no-decoration edituser" href="view_profile.php?id=' . $user->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Edit user profile"></a>';
                             echo '</div>';
                             echo '</div>';
                             echo '</div>';

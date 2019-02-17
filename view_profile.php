@@ -5,18 +5,27 @@ require_once 'auth/login.php';
 // TODO - Change this to allow user to change their profile
 $canManageProfile = $userRole->HasPermission("manage_profile");
 $canManageUsers = $userRole->HasPermission("manage_users");
+$canViewOtherProfiles = $userRole->HasPermission("view_profiles");
+
 if (!$canManageProfile && !$canManageUsers) {
     header("Location: user-home.php");
 }
 
-if (!isset($_GET['id'])) {
+$userId = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT);
+if (!$userId) {
     exit("Get params not set");
 }
 
-$userId = $_GET['id'];
-
 if (!$canManageUsers) {
-    $userId = $_SESSION["userid"];
+    if ($userId != $_SESSION["userid"]) {
+        if ($canViewOtherProfiles) {
+            $canManageProfile = FALSE;
+        } else {
+            $userId = $_SESSION["userid"];
+        }
+    }
+} else {
+    $canManageProfile = true;
 }
 
 $userName = User::GetUsernameFromId($userId);
@@ -77,7 +86,7 @@ $userEmail = User::GetEmailFromId($userId);
             <div class="row">
                 <div class="col-lg-4">
                     <div class="col-12 mb-2 py-2 bg-dark text-white">
-                        Edit User Profile
+                        User Profile
                     </div>
                     <div class="input-group mb-2">
                         <div class="input-group-prepend">
@@ -95,13 +104,16 @@ $userEmail = User::GetEmailFromId($userId);
                         echo '<input type="text" id="new-name" class="form-control" placeholder="Name" aria-label="Name" aria-describedby="name-addon" value="' . $userName . '">'
                         ?>
                     </div>
-                    <div class="input-group">
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="picture-upload">
-                            <label class="custom-file-label" for="picture-upload" aria-describedby="picture-upload-button" id="profile-label">Choose profile picture</label>
+
+                    <?php if ($canManageProfile) { ?>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="picture-upload">
+                                <label class="custom-file-label" for="picture-upload" aria-describedby="picture-upload-button" id="profile-label">Choose profile picture</label>
+                            </div>
                         </div>
-                    </div>
-                    <small class="form-text text-muted mb-3">(PNG, JPG) Max: 2 MB</small>
+                        <small class="form-text text-muted mb-3">(PNG, JPG) Max: 2 MB</small>
+                    <?php } ?>
 
                     <?php
                     $profilePictureFilepath1 = 'uploads/profile_pictures/' . $userId . '.jpeg';
@@ -118,10 +130,13 @@ $userEmail = User::GetEmailFromId($userId);
                     }
                     ?>
 
+
                     <div class="row mt-2">
                         <div class="col-12 text-left">
                             <a class="btn btn-secondary" href="manage_users.php">Back</a>
-                            <a class="btn btn-primary" href="#" id="save-changes-button">Save Changes</a>
+                            <?php if ($canManageProfile) { ?>
+                                <a class="btn btn-primary" href="#" id="save-changes-button">Save Changes</a>
+                            <?php } ?>
                         </div>
                     </div>
 
@@ -131,66 +146,93 @@ $userEmail = User::GetEmailFromId($userId);
                     </div>
                 </div>
 
+                <!-- Edit Contact Details-->
+                <div class="col-lg-4">
+                    <div class="col-12 mb-2 py-2 bg-dark text-white">
+                        Contact Details
+                    </div>
+
+                    <?php
+                    if ($canManageProfile) {
+                        // Allow changing contact details
+                    }
+                    ?>
+                </div>
+
+                <!-- Edit Assigned Courses-->
+                <div class="col-lg-4">
+                    <div class="col-12 mb-2 py-2 bg-dark text-white">
+                        Assigned Courses                      
+                    </div>     
+
+                    <?php
+                    if ($canManageUsers) {
+                        // Allow changing assigned courses
+                    }
+                    ?>
+                </div>
 
             </div>
         </div>
 
-        <!-- Upload Picture Script -->
+        <!-- Change Profile Script -->
         <script>
-            var selectedFile;
-            $(document).ready(function () {
-                $('#picture-upload').change(function (e) {
-                    e.preventDefault();
-                    selectedFile = e.target.files[0];
-                    var fileName = selectedFile.name;
-                    $('#profile-label').text(fileName);
-                });
+<?php if ($canManageProfile): ?>
+                var selectedFile;
+                $(document).ready(function () {
+                    $('#picture-upload').change(function (e) {
+                        e.preventDefault();
+                        selectedFile = e.target.files[0];
+                        var fileName = selectedFile.name;
+                        $('#profile-label').text(fileName);
+                    });
 
-                $('#save-changes-button').click(function (e) {
-                    e.preventDefault();
+                    $('#save-changes-button').click(function (e) {
+                        e.preventDefault();
 
-                    var formData = new FormData();
-                    var userId = $('#userid').text();
-                    var userName = $('#new-name').val();
-                    formData.append('name', userName);
-                    formData.append('userid', userId);
+                        var formData = new FormData();
+                        var userId = $('#userid').text();
+                        var userName = $('#new-name').val();
+                        formData.append('name', userName);
+                        formData.append('userid', userId);
 
-                    if (selectedFile) {
-                        formData.append('file', selectedFile);
-                    }
-
-                    $.ajax({
-                        type: "POST",
-                        url: "manage/modify_profile.php",
-                        cache: false,
-                        contentType: false,
-                        processData: false,
-                        data: formData,
-                        success: function (data) {
-                            data = $.parseJSON(data);
-                            var $success = data.success;
-                            var $message = data.message;
-
-                            var $alert = $('#editAlert');
-                            $alert.removeClass("invisible");
-                            if ($success) {
-                                $alert.removeClass("alert-danger");
-                                $alert.addClass("alert-success");
-                                $alert.find("#editAlertBody").html(function () {
-                                    return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'><strong>Please refresh to see changes</strong></a>";
-                                });
-
-                            } else {
-                                $alert.removeClass("alert-success");
-                                $alert.addClass("alert-danger");
-                                $alert.find("#editAlertBody").html(function () {
-                                    return "<strong>Error!</strong> " + $message;
-                                });
-                            }
+                        if (selectedFile) {
+                            formData.append('file', selectedFile);
                         }
+
+                        $.ajax({
+                            type: "POST",
+                            url: "manage/modify_profile.php",
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            data: formData,
+                            success: function (data) {
+                                data = $.parseJSON(data);
+                                var $success = data.success;
+                                var $message = data.message;
+
+                                var $alert = $('#editAlert');
+                                $alert.removeClass("invisible");
+                                if ($success) {
+                                    $alert.removeClass("alert-danger");
+                                    $alert.addClass("alert-success");
+                                    $alert.find("#editAlertBody").html(function () {
+                                        return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'><strong>Please refresh to see changes</strong></a>";
+                                    });
+
+                                } else {
+                                    $alert.removeClass("alert-success");
+                                    $alert.addClass("alert-danger");
+                                    $alert.find("#editAlertBody").html(function () {
+                                        return "<strong>Error!</strong> " + $message;
+                                    });
+                                }
+                            }
+                        });
                     });
                 });
-            });
+<?php endif; ?>
         </script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
