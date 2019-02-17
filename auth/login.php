@@ -20,10 +20,10 @@ class User {
         return $this->id;
     }
 
-    public function GetEmail(){
+    public function GetEmail() {
         return $this->email;
     }
-    
+
     public function GetName() {
         return $this->name;
     }
@@ -135,8 +135,8 @@ class User {
         $statement->bindValue("roleid", $roleId, PDO::PARAM_STR);
         $statement->execute();
     }
-    
-    public static function UnassignUserCourse($userId, $courseId){
+
+    public static function UnassignUserCourse($userId, $courseId) {
         $connection = MysqlConfig::Connect();
         $sql = "DELETE FROM CourseUsers WHERE userId = :userid AND courseId = :courseid";
         $statement = $connection->prepare($sql);
@@ -144,8 +144,28 @@ class User {
         $statement->bindValue("courseid", $courseId, PDO::PARAM_STR);
         $statement->execute();
     }
-    
-    public static function ChangeUserName($userId, $newName){
+
+    public static function AssignUserCourse($userId, $courseId) {
+        $connection = MysqlConfig::Connect();
+        $sql = "INSERT INTO CourseUsers (userId, courseId) VALUES (:userid, :courseid)";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("userid", $userId, PDO::PARAM_STR);
+        $statement->bindValue("courseid", $courseId, PDO::PARAM_STR);
+        $statement->execute();
+    }
+
+    public static function HasCourse($userId, $courseId) {
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT id FROM CourseUsers WHERE userId = :userid AND courseId = :courseid LIMIT 1";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("userid", $userId, PDO::PARAM_STR);
+        $statement->bindValue("courseid", $courseId, PDO::PARAM_STR);
+        $statement->execute();
+
+        return count($statement->fetchAll()) > 0 ? TRUE : FALSE;
+    }
+
+    public static function ChangeUserName($userId, $newName) {
         $connection = MysqlConfig::Connect();
         $sql = "UPDATE Users SET name=:name WHERE id=:userid";
         $statement = $connection->prepare($sql);
@@ -153,8 +173,8 @@ class User {
         $statement->bindValue("userid", $userId, PDO::PARAM_STR);
         $statement->execute();
     }
-    
-    public static function GetUserIdFromEmail($email){
+
+    public static function GetUserIdFromEmail($email) {
         $connection = MysqlConfig::Connect();
         $sql = "SELECT id FROM Users WHERE email = :email LIMIT 1";
         $statement = $connection->prepare($sql);
@@ -163,8 +183,8 @@ class User {
 
         return $statement->fetchColumn();
     }
-    
-    public static function GetEmailFromId($userId){
+
+    public static function GetEmailFromId($userId) {
         $connection = MysqlConfig::Connect();
         $sql = "SELECT email FROM Users WHERE id = :id LIMIT 1";
         $statement = $connection->prepare($sql);
@@ -173,8 +193,8 @@ class User {
 
         return $statement->fetchColumn();
     }
-    
-    public static function GetUsernameFromId($userId){
+
+    public static function GetUsernameFromId($userId) {
         $connection = MysqlConfig::Connect();
         $sql = "SELECT name FROM Users WHERE id = :id LIMIT 1";
         $statement = $connection->prepare($sql);
@@ -183,6 +203,7 @@ class User {
 
         return $statement->fetchColumn();
     }
+
 }
 
 if (isset($_POST['email'], $_POST['password'])) {

@@ -36,8 +36,8 @@ if (!$userRole->HasPermission("manage_roles")) {
 
         <script>
             $(function () {
-                $('[data-toggle="tooltip"]').tooltip()
-            })
+                $('[data-toggle="tooltip"]').tooltip();
+            });
         </script>
 
         <nav class="navbar navbar-expand-md navbar-dark bg-dark static-top">
@@ -256,7 +256,7 @@ if (!$userRole->HasPermission("manage_roles")) {
                                     $alert.removeClass("alert-danger");
                                     $alert.addClass("alert-success");
                                     $alert.find("#roleAlertBody").html(function () {
-                                        return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'><strong>Please refresh to see changes</strong></a>";
+                                        return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
                                     });
 
                                 } else {

@@ -251,7 +251,7 @@ if (!$userRole->HasPermission("manage_users")) {
                                         $alert.removeClass("alert-danger");
                                         $alert.addClass("alert-success");
                                         $alert.find("#userAlertBody").html(function () {
-                                            return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'><strong>Please refresh to see changes</strong></a>";
+                                            return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
                                         });
 
                                     } else {

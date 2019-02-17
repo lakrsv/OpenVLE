@@ -197,11 +197,6 @@ $userEmail = User::GetEmailFromId($userId);
                             </tbody>
                         </table>
                     </div>
-                    
-                    <!-- Alert Box -->
-                    <div id ="courseAlert" class="alert alert-danger show invisible mt-2" role="alert">
-                        <div id="courseAlertBody"></div>
-                    </div>
 
                     <?php if ($canManageUsers) { ?>
                         <script>
@@ -210,7 +205,7 @@ $userEmail = User::GetEmailFromId($userId);
                             $(document).ready(function () {
                                 $('.unassigncourse').click(function (e) {
                                     e.preventDefault();
-                                    
+
                                     userId = $('#userid').text();
                                     courseId = $(this).closest('tr').attr('id').replace('course-', '');
 
@@ -262,6 +257,72 @@ $userEmail = User::GetEmailFromId($userId);
                             });
                         </script>
                     <?php } ?>
+
+                    <?php if ($canManageUsers) { ?>
+                        <div class="input-group">
+                            <select class="custom-select" id="select-course">
+                                <option selected>Choose Course...</option>
+                                <?php
+                                $allCourses = Course::GetAll();
+                                $userCourses = Course::GetCoursesForUser($userId);
+
+                                foreach ($allCourses as $course) {
+                                    if (in_array($course, $userCourses)) {
+                                        continue;
+                                    }
+                                    echo '<option value="' . $course->GetId() . '">' . $course->GetName() . '</option>';
+                                }
+                                ?>
+                            </select>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="assigncourse">Add</button>
+                            </div>
+                        </div>
+
+                        <!-- Alert Box -->
+                        <div id ="courseAlert" class="alert alert-danger show invisible mt-2" role="alert">
+                            <div id="courseAlertBody"></div>
+                        </div>
+
+                        <script>
+                            $(document).ready(function () {
+                                $('#assigncourse').click(function (e) {
+                                    e.preventDefault();
+                                    var courseId = $('#select-course').children("option:selected").val();
+                                    var userId = $('#userid').text();
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "manage/modify_user.php",
+                                        data: {
+                                            action: "assign-course",
+                                            user: userId,
+                                            course: courseId
+                                        },
+                                        success: function (data) {
+                                            data = $.parseJSON(data);
+                                            var $success = data.success;
+                                            var $message = data.message;
+                                            var $alert = $('#courseAlert');
+                                            $alert.removeClass("invisible");
+                                            if ($success) {
+                                                $alert.removeClass("alert-danger");
+                                                $alert.addClass("alert-success");
+                                                $alert.find("#courseAlertBody").html(function () {
+                                                    return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
+                                                });
+                                            } else {
+                                                $alert.removeClass("alert-success");
+                                                $alert.addClass("alert-danger");
+                                                $alert.find("#courseAlertBody").html(function () {
+                                                    return "<strong>Error!</strong> " + $message;
+                                                });
+                                            }
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
+                    <?php } ?>
                 </div>
 
             </div>
@@ -299,16 +360,13 @@ $userEmail = User::GetEmailFromId($userId);
                         var fileName = selectedFile.name;
                         $('#profile-label').text(fileName);
                     });
-
                     $('#save-changes-button').click(function (e) {
                         e.preventDefault();
-
                         var formData = new FormData();
                         var userId = $('#userid').text();
                         var userName = $('#new-name').val();
                         formData.append('name', userName);
                         formData.append('userid', userId);
-
                         if (selectedFile) {
                             formData.append('file', selectedFile);
                         }
@@ -324,16 +382,14 @@ $userEmail = User::GetEmailFromId($userId);
                                 data = $.parseJSON(data);
                                 var $success = data.success;
                                 var $message = data.message;
-
                                 var $alert = $('#editAlert');
                                 $alert.removeClass("invisible");
                                 if ($success) {
                                     $alert.removeClass("alert-danger");
                                     $alert.addClass("alert-success");
                                     $alert.find("#editAlertBody").html(function () {
-                                        return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'><strong>Please refresh to see changes</strong></a>";
+                                        return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
                                     });
-
                                 } else {
                                     $alert.removeClass("alert-success");
                                     $alert.addClass("alert-danger");

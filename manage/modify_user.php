@@ -40,6 +40,12 @@ switch ($action) {
             exit("courseId not set");
         }
         return TryUnassignCourse($user, $courseId);
+    case 'assign-course':
+        $courseId = filter_input(INPUT_POST, "course", FILTER_SANITIZE_NUMBER_INT);
+        if (!$courseId) {
+            exit("courseId not set");
+        }
+        return TryAssignCourse($user, $courseId);
 }
 
 function TryDeleteUser($userId) {
@@ -117,6 +123,32 @@ function TryUnassignCourse($userId, $courseId) {
         User::UnassignUserCourse($userId, $courseId);
         $response['success'] = TRUE;
         $response['message'] = "Unassigned course from user";
+        echo json_encode($response);
+        return TRUE;
+    }
+}
+
+function TryAssignCourse($userId, $courseId) {
+    $response = array();
+    if (!User::UserWithIdExists($userId)) {
+        $response['success'] = FALSE;
+        $response['message'] = "Can't assign course for user that does not exist";
+        echo json_encode($response);
+        return FALSE;
+    } else if (!Course::CourseWithIdExists($courseId)) {
+        $response['success'] = FALSE;
+        $response['message'] = "Can't assign course that doesn't exist";
+        echo json_encode($response);
+        return FALSE;
+    } else if (User::HasCourse($userId, $courseId)) {
+        $response['success'] = FALSE;
+        $response['message'] = "Can't assign course because user already has it";
+        echo json_encode($response);
+        return FALSE;
+    } else {
+        User::AssignUserCourse($userId, $courseId);
+        $response['success'] = TRUE;
+        $response['message'] = "Assigned course to user";
         echo json_encode($response);
         return TRUE;
     }
