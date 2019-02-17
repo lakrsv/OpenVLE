@@ -173,6 +173,25 @@ class User {
         $statement->bindValue("userid", $userId, PDO::PARAM_STR);
         $statement->execute();
     }
+    
+    public static function ChangeUserProfilePicture($userId, $imageData){
+        $connection = MysqlConfig::Connect();
+        $sql = "DELETE FROM UserProfilePicture WHERE userId=:userid; INSERT INTO UserProfilePicture (userId, img) VALUES (:userid, :img)";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("userid", $userId, PDO::PARAM_STR);
+        $statement->bindValue("img", $imageData, PDO::PARAM_STR);
+        $statement->execute();
+    }
+    
+    public static function GetUserProfilePicture($userId){
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT img FROM UserProfilePicture WHERE userId=:userid LIMIT 1;";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("userid", $userId, PDO::PARAM_STR);
+        $statement->execute();
+        
+        return $statement->fetchColumn();
+    }
 
     public static function GetUserIdFromEmail($email) {
         $connection = MysqlConfig::Connect();

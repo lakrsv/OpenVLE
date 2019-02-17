@@ -64,14 +64,11 @@ function TryChangeProfile($userId) {
 }
 
 function TryChangePicture($userId) {
-    $uploadDirectory = __DIR__ . "/../uploads/profile_pictures/";
     $allowedExtensions = [IMAGETYPE_JPEG, IMAGETYPE_PNG];
     $maxImageSize = 2000000;
 
     $file = $_FILES["file"];
     $imageType = exif_imagetype($file["tmp_name"]);
-
-    $uploadPath = $uploadDirectory . basename($userId) . image_type_to_extension($imageType);
 
     $response = array();
 
@@ -88,22 +85,12 @@ function TryChangePicture($userId) {
         return $response;
     }
 
-    if (file_exists($uploadPath)) {
-        chmod($uploadPath, 0755);
-    }
-
-    if (move_uploaded_file($file["tmp_name"], $uploadPath)) {
-        $response['success'] = TRUE;
-        $response['message'] = "Image successfully uploaded!";
-
-        return $response;
-    } else {
-        $response['success'] = FALSE;
-        $response['message'] = "An error occured while trying to upload the image";
-        echo json_encode($response);
-
-        return $response;
-    }
+    $fileData = file_get_contents($file["tmp_name"]);
+    User::ChangeUserProfilePicture($userId, $fileData);
+    
+    $response['success'] = TRUE;
+    $response['message'] = "Image successfully uploaded!";
+    return $response;
 }
 
 function TryChangeName($userId, $newName) {

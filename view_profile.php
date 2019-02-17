@@ -135,17 +135,9 @@ $userEmail = User::GetEmailFromId($userId);
                             <?php } ?>
 
                             <?php
-                            $profilePictureFilepath1 = 'uploads/profile_pictures/' . $userId . '.jpeg';
-                            $profilePictureFilepath2 = 'uploads/profile_pictures/' . $userId . '.png';
-                            $realPicturePath;
-                            if (file_exists($profilePictureFilepath1)) {
-                                $realPicturePath = $profilePictureFilepath1;
-                            } else if (file_exists($profilePictureFilepath2)) {
-                                $realPicturePath = $profilePictureFilepath2;
-                            }
-
-                            if (isset($realPicturePath)) {
-                                echo '<img src="' . $realPicturePath . '?' . filemtime($realPicturePath) . '" class="img-fluid" alt="Profile Picture">';
+                            $imageData = User::GetUserProfilePicture($userId);
+                            if ($imageData) {
+                                echo '<img src="data:image/jpg;base64,' . base64_encode($imageData) . '" class="img-fluid" alt="Profile Picture"/>';
                             }
                             ?>                     
                         </div>
@@ -447,6 +439,7 @@ $userEmail = User::GetEmailFromId($userId);
                             processData: false,
                             data: formData,
                             success: function (data) {
+                                alert(data);
                                 data = $.parseJSON(data);
                                 var $success = data.success;
                                 var $message = data.message;
