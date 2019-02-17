@@ -99,7 +99,7 @@ class Course {
     
     public static function GetCoursesForUser($userId){
         $connection = MysqlConfig::Connect();
-        $sql = "SELECT c.* FROM CourseUsers cu INNER JOIN Courses c ON cu.userId = :userid WHERE cu.userId = :userid";
+        $sql = "SELECT c.* FROM CourseUsers cu INNER JOIN Courses c ON cu.courseId = c.id WHERE cu.userId = :userid";
         $statement = $connection->prepare($sql);
         $statement->bindValue("userid", $userId, PDO::PARAM_STR);
         $statement->execute();

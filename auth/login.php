@@ -136,6 +136,15 @@ class User {
         $statement->execute();
     }
     
+    public static function UnassignUserCourse($userId, $courseId){
+        $connection = MysqlConfig::Connect();
+        $sql = "DELETE FROM CourseUsers WHERE userId = :userid AND courseId = :courseid";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("userid", $userId, PDO::PARAM_STR);
+        $statement->bindValue("courseid", $courseId, PDO::PARAM_STR);
+        $statement->execute();
+    }
+    
     public static function ChangeUserName($userId, $newName){
         $connection = MysqlConfig::Connect();
         $sql = "UPDATE Users SET name=:name WHERE id=:userid";

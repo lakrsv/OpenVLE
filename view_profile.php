@@ -185,7 +185,7 @@ $userEmail = User::GetEmailFromId($userId);
                                     echo '</div>';
                                     if ($canManageUsers) {
                                         echo '<div class="col-2 text-right">';
-                                        echo '<a class="far fa-times-circle text-danger no-decoration unassigncourse" href="#" data-toggle="tooltip" data-placement="bottom" title="Unassign course"></a>';
+                                        echo '<a class="far fa-times-circle text-danger no-decoration unassigncourse" href="#" data-toggle="tooltip" data-placement="left" title="Unassign course"></a>';
                                         echo '</div>';
                                     }
                                     echo '</div>';
@@ -197,11 +197,94 @@ $userEmail = User::GetEmailFromId($userId);
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- Alert Box -->
+                    <div id ="courseAlert" class="alert alert-danger show invisible mt-2" role="alert">
+                        <div id="courseAlertBody"></div>
+                    </div>
 
                     <?php if ($canManageUsers) { ?>
+                        <script>
+                            var courseId;
+                            var userId;
+                            $(document).ready(function () {
+                                $('.unassigncourse').click(function (e) {
+                                    e.preventDefault();
+                                    
+                                    userId = $('#userid').text();
+                                    courseId = $(this).closest('tr').attr('id').replace('course-', '');
+
+                                    var $modal = $('#profileModal');
+                                    $modal.find('.modal-body').html(function () {
+                                        return "You are about unassign this course."
+                                                + "<br><strong>Are you sure?</strong>";
+                                    });
+                                    $modal.modal({
+                                        show: true
+                                    });
+                                });
+                                $('#modalConfirmButton').click(function (e) {
+                                    e.preventDefault();
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "manage/modify_user.php",
+                                        data: {
+                                            action: "unassign-course",
+                                            user: userId,
+                                            course: courseId
+                                        },
+                                        success: function (data) {
+                                            alert(data);
+                                            data = $.parseJSON(data);
+                                            var $success = data.success;
+                                            var $message = data.message;
+
+                                            var $alert = $('#courseAlert');
+                                            $alert.removeClass("invisible");
+                                            if ($success) {
+                                                $alert.removeClass("alert-danger");
+                                                $alert.addClass("alert-success");
+                                                $alert.find("#courseAlertBody").html(function () {
+                                                    return "<strong>Success!</strong> " + $message;
+                                                });
+                                                $('#course-' + courseId).remove();
+
+                                            } else {
+                                                $alert.removeClass("alert-success");
+                                                $alert.addClass("alert-danger");
+                                                $alert.find("#courseAlertBody").html(function () {
+                                                    return "<strong>Error!</strong> " + $message;
+                                                });
+                                            }
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
                     <?php } ?>
                 </div>
 
+            </div>
+        </div>
+
+        <!-- Delete Role Confirmation Modal -->
+        <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="profileModalLabel">Delete Role</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        You are about to delete this role! Are you sure?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                        <button id="modalConfirmButton" type="submit" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                    </div>
+                </div>
             </div>
         </div>
 
