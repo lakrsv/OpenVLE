@@ -32,6 +32,13 @@ if (!$userRole->HasPermission("manage_users")) {
         <title>OpenVLE - Admin</title>
     </head>
     <body>
+
+        <script>
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+        </script>
+
         <nav class="navbar navbar-expand-md navbar-dark bg-dark static-top">
             <a class="navbar-brand" href="#">OpenVLE Admin</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapse" aria-controls="collapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +87,7 @@ if (!$userRole->HasPermission("manage_users")) {
                             echo $user->GetEmail();
                             echo '</div>';
                             echo '<div class="col-2 text-right">';
-                            echo '<a class="far fa-edit text-dark no-decoration edituser" href="edit_user.php?id='.$user->GetId().'"></a>';
+                            echo '<a class="far fa-edit text-dark no-decoration edituser" href="edit_user.php?id=' . $user->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Edit user profile"></a>';
                             echo '</div>';
                             echo '</div>';
                             echo '</div>';
@@ -161,7 +168,7 @@ if (!$userRole->HasPermission("manage_users")) {
                         });
                     });
                 </script>
-                
+
                 <!-- Change Role Script -->
                 <script>
                     $(document).ready(function () {
@@ -169,7 +176,7 @@ if (!$userRole->HasPermission("manage_users")) {
                             var $selected = $(this).find("option:selected");
                             var $roleName = $selected.val();
                             var $userId = $(this).closest("tr").attr("id").replace("user-", "");
-                                                       
+
                             $.ajax({
                                 type: "POST",
                                 url: "manage/modify_user.php",
@@ -223,7 +230,7 @@ if (!$userRole->HasPermission("manage_users")) {
                             var $email = $('#email').val();
                             var $username = $('#username').val();
                             var $password = $('#password').val()
-                            
+
                             $.ajax({
                                 type: "POST",
                                 url: "manage/modify_user.php",

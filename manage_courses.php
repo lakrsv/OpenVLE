@@ -32,6 +32,13 @@ if (!$userRole->HasPermission("manage_courses")) {
         <title>OpenVLE - Admin</title>
     </head>
     <body>
+
+        <script>
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+        </script>
+
         <nav class="navbar navbar-expand-md navbar-dark bg-dark static-top">
             <a class="navbar-brand" href="#">OpenVLE Admin</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapse" aria-controls="collapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,7 +84,7 @@ if (!$userRole->HasPermission("manage_courses")) {
                             echo $course->GetName();
                             echo '</div>';
                             echo '<div class="col-2 text-right">';
-                            echo '<a class="far fa-edit text-dark no-decoration editcourse" href="edit_course.php?id='.$course->GetId().'"></a>';
+                            echo '<a class="far fa-edit text-dark no-decoration editcourse" href="edit_course.php?id=' . $course->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Edit course"></a>';
                             echo '</div>';
                             echo '</div>';
                             echo '</div>';
