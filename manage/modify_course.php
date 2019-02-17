@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../auth/mysql_config.php';
-require_once __DIR__ . '/../course/course.php';
+require_once __DIR__ . '/../classes/course.php';
 require_once __DIR__ . '/../header/auth_header.php';
 
 if (!isset($_POST['action'], $_POST['course'])) {

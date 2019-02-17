@@ -1,7 +1,8 @@
 <?php
 require_once 'header/auth_header.php';
 require_once 'auth/login.php';
-require_once 'course/course.php';
+require_once 'classes/course.php';
+require_once 'classes/contactDetails.php';
 
 // TODO - Change this to allow user to change their profile
 $canManageProfile = $userRole->HasPermission("manage_profile");
@@ -146,33 +147,74 @@ $userEmail = User::GetEmailFromId($userId);
                             if (isset($realPicturePath)) {
                                 echo '<img src="' . $realPicturePath . '?' . filemtime($realPicturePath) . '" class="img-fluid" alt="Profile Picture">';
                             }
-                            ?>
-
-
-                            <div class="row mt-2">
-                                <div class="col-12 text-left">
-                                    <a class="btn btn-secondary" href="manage_users.php">Back</a>
-                                    <?php if ($canManageProfile) { ?>
-                                        <a class="btn btn-primary" href="#" id="save-changes-button">Save Changes</a>
-                                    <?php } ?>
-                                </div>
-                            </div>
-
-                            <!-- Alert Box -->
-                            <div id ="editAlert" class="alert alert-danger show invisible mt-2" role="alert">
-                                <div id="editAlertBody"></div>
-                            </div>
+                            ?>                     
                         </div>
 
-                        <!-- Edit Contact Details-->
+                        <!-- Contact Details-->
                         <div class="col-lg-6 pl-1 pr-0">
                             <div class="col-12 mb-2 py-2 bg-secondary text-white">
                                 Contact Details
                             </div>
 
+                            <?php
+                            $contactDetails = ContactDetails::GetContactDetailsForUser($userId);
+                            ?>
+
+                            <div class="form-group">
+                                <label for="addressLine1">Address Line 1</label>
+                                <?php
+                                $addressLine1 = $contactDetails ? 'value="' . $contactDetails->getAddressLine1() . '"' : 'placeholder="Enter Address Line 1"';
+                                echo '<input type="text" class="form-control" id="addressLine1" ' . $addressLine1 . '>';
+                                ?>
+                            </div>
+                            <div class="form-group">
+                                <label for="addressLine2">Adress Line 2</label>
+                                <?php
+                                $addressLine2 = $contactDetails ? 'value="' . $contactDetails->getAddressLine2() . '"' : 'placeholder="Enter Address Line 2"';
+                                echo '<input type="text" class="form-control" id="addressLine2" ' . $addressLine2 . '>';
+                                ?>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="city">City</label>
+                                    <?php
+                                    $city = $contactDetails ? 'value="' . $contactDetails->getCity() . '"' : 'placeholder="Enter City"';
+                                    echo '<input type="text" class="form-control" id="city" ' . $city . '>';
+                                    ?>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="zip">Zip</label>
+                                    <?php
+                                    $zip = $contactDetails ? 'value="' . $contactDetails->getZip() . '"' : 'placeholder="Enter Zip Code"';
+                                    echo '<input type="text" class="form-control" id="zip" ' . $zip . '>';
+                                    ?>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phoneNumber">Phone Number</label>
+                                <?php
+                                $number = $contactDetails ? 'value="' . $contactDetails->getNumber() . '"' : 'placeholder="Enter Phone Number"';
+                                echo '<input type="text" class="form-control" id="phoneNumber" ' . $number . '>';
+                                ?>
+                            </div>
+
                             <?php if ($canManageProfile) { ?>
                             <?php } ?>
                         </div>
+
+                        <div class="row mt-2">
+                            <div class="col-12 text-left">
+                                <a class="btn btn-secondary" href="manage_users.php">Back</a>
+                                <?php if ($canManageProfile) { ?>
+                                    <a class="btn btn-primary" href="#" id="save-changes-button">Save Changes</a>
+                                <?php } ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alert Box -->
+                    <div id ="editAlert" class="alert alert-danger show invisible mt-2" role="alert">
+                        <div id="editAlertBody"></div>
                     </div>
                 </div>
 
@@ -340,7 +382,7 @@ $userEmail = User::GetEmailFromId($userId);
             </div>
         </div>
 
-        <!-- Delete Role Confirmation Modal -->
+        <!-- Profile Confirmation Modal -->
         <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -351,7 +393,6 @@ $userEmail = User::GetEmailFromId($userId);
                         </button>
                     </div>
                     <div class="modal-body">
-                        You are about to delete this role! Are you sure?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
@@ -379,8 +420,23 @@ $userEmail = User::GetEmailFromId($userId);
                         var userName = $('#new-name').val();
                         formData.append('name', userName);
                         formData.append('userid', userId);
+
                         if (selectedFile) {
                             formData.append('file', selectedFile);
+                        }
+
+                        var addressLine1 = $('#addressLine1').val();
+                        var addressLine2 = $('#addressLine2').val();
+                        var city = $('#city').val();
+                        var zip = $('#zip').val();
+                        var number = $('#phoneNumber').val();
+
+                        if (addressLine1 && addressLine2 && city && zip && number) {
+                            formData.append('addressLine1', addressLine1);
+                            formData.append('addressLine2', addressLine2);
+                            formData.append('city', city);
+                            formData.append('zip', zip);
+                            formData.append('number', number);
                         }
 
                         $.ajax({

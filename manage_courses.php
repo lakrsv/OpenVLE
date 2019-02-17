@@ -1,6 +1,6 @@
 <?php
 require_once 'header/auth_header.php';
-require_once 'course/course.php';
+require_once 'classes/course.php';
 
 if (!$userRole->HasPermission("manage_courses")) {
     header("Location: user-home.php");

@@ -4,7 +4,7 @@ require_once __DIR__ . '/../auth/mysql_config.php';
 require_once __DIR__ . '/../auth/role.php';
 require_once __DIR__ . '/../auth/login.php';
 require_once __DIR__ . '/../header/auth_header.php';
-require_once __DIR__ . '/../course/course.php';
+require_once __DIR__ . '/../classes/course.php';
 
 if (!isset($_POST['action'], $_POST['user'])) {
     exit("Post params not set");

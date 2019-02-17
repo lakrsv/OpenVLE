@@ -4,6 +4,7 @@ require_once __DIR__ . '/../auth/mysql_config.php';
 require_once __DIR__ . '/../auth/role.php';
 require_once __DIR__ . '/../header/auth_header.php';
 require_once __DIR__ . '/../auth/login.php';
+require_once __DIR__ . '/../classes/contactDetails.php';
 
 if (!$userRole->HasPermission("manage_profile")) {
     header("Location: user-home.php");
@@ -37,6 +38,19 @@ function TryChangeProfile($userId) {
     $name = filter_input(INPUT_POST, "name", FILTER_SANITIZE_STRING);
     if ($name) {
         $response = TryChangeName($userId, $name);
+        if (!$response["success"]) {
+            echo json_encode($response);
+            return FALSE;
+        }
+    }
+
+    $addressLine1 = filter_input(INPUT_POST, "addressLine1", FILTER_SANITIZE_STRING);
+    $addressLine2 = filter_input(INPUT_POST, "addressLine2", FILTER_SANITIZE_STRING);
+    $city = filter_input(INPUT_POST, "city", FILTER_SANITIZE_STRING);
+    $zip = filter_input(INPUT_POST, "zip", FILTER_SANITIZE_STRING);
+    $number = filter_input(INPUT_POST, "number", FILTER_SANITIZE_STRING);
+    if ($addressLine1 && $addressLine2 && $city && $zip && $number) {
+        $response = TryChangeContactDetails($userId, $addressLine1, $addressLine2, $city, $zip, $number);
         if (!$response["success"]) {
             echo json_encode($response);
             return FALSE;
@@ -105,6 +119,20 @@ function TryChangeName($userId, $newName) {
 
     $response['success'] = FALSE;
     $response['message'] = "Failed updating username";
+    return $response;
+}
+
+function TryChangeContactDetails($userId, $addressLine1, $addressLine2, $city, $zip, $number) {
+    $response = array();
+    if (User::UserWithIdExists($userId)) {
+        ContactDetails::AddContactDetailsForUser($userId, $addressLine1, $addressLine2, $city, $zip, $number);
+        $response['success'] = TRUE;
+        $response['message'] = "Successfully changed contact details!";
+        return $response;
+    }
+
+    $response['success'] = FALSE;
+    $response['message'] = "Failed changing contact details";
     return $response;
 }
 
