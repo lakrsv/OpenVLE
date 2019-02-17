@@ -1,6 +1,7 @@
 <?php
 require_once 'header/auth_header.php';
 require_once 'auth/login.php';
+require_once 'course/course.php';
 
 // TODO - Change this to allow user to change their profile
 $canManageProfile = $userRole->HasPermission("manage_profile");
@@ -57,6 +58,13 @@ $userEmail = User::GetEmailFromId($userId);
         <title>OpenVLE - Admin</title>
     </head>
     <body>
+
+        <script>
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+        </script>
+
         <nav class="navbar navbar-expand-md navbar-dark bg-dark static-top">
             <a class="navbar-brand" href="#">OpenVLE Admin</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapse" aria-controls="collapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -152,11 +160,8 @@ $userEmail = User::GetEmailFromId($userId);
                         Contact Details
                     </div>
 
-                    <?php
-                    if ($canManageProfile) {
-                        // Allow changing contact details
-                    }
-                    ?>
+                    <?php if ($canManageProfile) { ?>
+                    <?php } ?>
                 </div>
 
                 <!-- Edit Assigned Courses-->
@@ -165,11 +170,36 @@ $userEmail = User::GetEmailFromId($userId);
                         Assigned Courses                      
                     </div>     
 
-                    <?php
-                    if ($canManageUsers) {
-                        // Allow changing assigned courses
-                    }
-                    ?>
+                    <div id="courseTable" class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <tbody>
+                                <?php
+                                $courses = Course::GetCoursesForUser($userId);
+                                foreach ($courses as $course) {
+                                    echo '<tr id=course-' . $course->GetId() . '>';
+                                    echo '<th scope="row">';
+                                    echo '<div class="container">';
+                                    echo '<div class="row">';
+                                    echo '<div class="col-10 coursename">';
+                                    echo $course->GetName();
+                                    echo '</div>';
+                                    if ($canManageUsers) {
+                                        echo '<div class="col-2 text-right">';
+                                        echo '<a class="far fa-times-circle text-danger no-decoration unassigncourse" href="#" data-toggle="tooltip" data-placement="bottom" title="Unassign course"></a>';
+                                        echo '</div>';
+                                    }
+                                    echo '</div>';
+                                    echo '</div>';
+                                    echo '</th>';
+                                    echo '</tr>';
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <?php if ($canManageUsers) { ?>
+                    <?php } ?>
                 </div>
 
             </div>

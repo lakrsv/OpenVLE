@@ -96,4 +96,19 @@ class Course {
 
         return $course;
     }
+    
+    public static function GetCoursesForUser($userId){
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT c.* FROM CourseUsers cu INNER JOIN Courses c ON cu.userId = :userid WHERE cu.userId = :userid";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("userid", $userId, PDO::PARAM_STR);
+        $statement->execute();
+        
+        $coursesForUser = array();
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            array_push($coursesForUser, new Course($row['id'], $row['name'], $row['description']));
+        }
+
+        return $coursesForUser;
+    }
 }
