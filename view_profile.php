@@ -92,76 +92,88 @@ $userEmail = User::GetEmailFromId($userId);
 
         <div class="container-fluid mt-2">
             <div class="row">
-                <div class="col-lg-4">
+                <div class="col-lg-8">
+
                     <div class="col-12 mb-2 py-2 bg-dark text-white">
                         User Profile
                     </div>
-                    <div class="input-group mb-2">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="email-addon">E-mail</span>
-                        </div>
-                        <?php
-                        echo '<input type="text" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="email-addon" value="' . $userEmail . '" readonly>'
-                        ?>                    
-                    </div>
-                    <div class="input-group mb-2">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="name-addon">Name</span>
-                        </div>
-                        <?php
-                        echo '<input type="text" id="new-name" class="form-control" placeholder="Name" aria-label="Name" aria-describedby="name-addon" value="' . $userName . '">'
-                        ?>
-                    </div>
 
-                    <?php if ($canManageProfile) { ?>
-                        <div class="input-group">
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="picture-upload">
-                                <label class="custom-file-label" for="picture-upload" aria-describedby="picture-upload-button" id="profile-label">Choose profile picture</label>
+                    <div class="row px-3">
+                        <!-- General Profile Details -->
+                        <div class="col-lg-6 pr-1 pl-0">
+
+                            <div class="col-12 mb-2 py-2 bg-secondary text-white">
+                                General Details
+                            </div>
+
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="email-addon">E-mail</span>
+                                </div>
+                                <?php
+                                echo '<input type="text" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="email-addon" value="' . $userEmail . '" readonly>'
+                                ?>                    
+                            </div>
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="name-addon">Name</span>
+                                </div>
+                                <?php
+                                echo '<input type="text" id="new-name" class="form-control" placeholder="Name" aria-label="Name" aria-describedby="name-addon" value="' . $userName . '">'
+                                ?>
+                            </div>
+
+                            <?php if ($canManageProfile) { ?>
+                                <div class="input-group">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="picture-upload">
+                                        <label class="custom-file-label" for="picture-upload" aria-describedby="picture-upload-button" id="profile-label">Choose profile picture</label>
+                                    </div>
+                                </div>
+                                <small class="form-text text-muted mb-3">(PNG, JPG) Max: 2 MB</small>
+                            <?php } ?>
+
+                            <?php
+                            $profilePictureFilepath1 = 'uploads/profile_pictures/' . $userId . '.jpeg';
+                            $profilePictureFilepath2 = 'uploads/profile_pictures/' . $userId . '.png';
+                            $realPicturePath;
+                            if (file_exists($profilePictureFilepath1)) {
+                                $realPicturePath = $profilePictureFilepath1;
+                            } else if (file_exists($profilePictureFilepath2)) {
+                                $realPicturePath = $profilePictureFilepath2;
+                            }
+
+                            if (isset($realPicturePath)) {
+                                echo '<img src="' . $realPicturePath . '?' . filemtime($realPicturePath) . '" class="img-fluid" alt="Profile Picture">';
+                            }
+                            ?>
+
+
+                            <div class="row mt-2">
+                                <div class="col-12 text-left">
+                                    <a class="btn btn-secondary" href="manage_users.php">Back</a>
+                                    <?php if ($canManageProfile) { ?>
+                                        <a class="btn btn-primary" href="#" id="save-changes-button">Save Changes</a>
+                                    <?php } ?>
+                                </div>
+                            </div>
+
+                            <!-- Alert Box -->
+                            <div id ="editAlert" class="alert alert-danger show invisible mt-2" role="alert">
+                                <div id="editAlertBody"></div>
                             </div>
                         </div>
-                        <small class="form-text text-muted mb-3">(PNG, JPG) Max: 2 MB</small>
-                    <?php } ?>
 
-                    <?php
-                    $profilePictureFilepath1 = 'uploads/profile_pictures/' . $userId . '.jpeg';
-                    $profilePictureFilepath2 = 'uploads/profile_pictures/' . $userId . '.png';
-                    $realPicturePath;
-                    if (file_exists($profilePictureFilepath1)) {
-                        $realPicturePath = $profilePictureFilepath1;
-                    } else if (file_exists($profilePictureFilepath2)) {
-                        $realPicturePath = $profilePictureFilepath2;
-                    }
+                        <!-- Edit Contact Details-->
+                        <div class="col-lg-6 pl-1 pr-0">
+                            <div class="col-12 mb-2 py-2 bg-secondary text-white">
+                                Contact Details
+                            </div>
 
-                    if (isset($realPicturePath)) {
-                        echo '<img src="' . $realPicturePath . '?' . filemtime($realPicturePath) . '" class="img-fluid" alt="Profile Picture">';
-                    }
-                    ?>
-
-
-                    <div class="row mt-2">
-                        <div class="col-12 text-left">
-                            <a class="btn btn-secondary" href="manage_users.php">Back</a>
                             <?php if ($canManageProfile) { ?>
-                                <a class="btn btn-primary" href="#" id="save-changes-button">Save Changes</a>
                             <?php } ?>
                         </div>
                     </div>
-
-                    <!-- Alert Box -->
-                    <div id ="editAlert" class="alert alert-danger show invisible mt-2" role="alert">
-                        <div id="editAlertBody"></div>
-                    </div>
-                </div>
-
-                <!-- Edit Contact Details-->
-                <div class="col-lg-4">
-                    <div class="col-12 mb-2 py-2 bg-dark text-white">
-                        Contact Details
-                    </div>
-
-                    <?php if ($canManageProfile) { ?>
-                    <?php } ?>
                 </div>
 
                 <!-- Edit Assigned Courses-->
