@@ -56,6 +56,19 @@ if (!$userRole->HasPermission("manage_users")) {
                         <a class="nav-link" href="manage_roles.php">Manage Roles</a>
                     </li>
                 </ul>
+                <a id="inbox" class="btn btn-default">
+                    <span class="fa-stack">
+                        <i class="fas fa-envelope fa-stack-2x text-white"></i>
+                        <i class="fa-stack-1x text-info text-right pr-1 pt-3">
+                            <h5>
+                                <strong>
+                                    <!-- Amount in inbox -->
+                                    <!--+1-->
+                                </strong>
+                            </h5>
+                        </i>
+                    </span>
+                </a>
                 <a id="logout" class="btn btn-outline-danger pull-right my-2 my-sm-0" href="auth/log_out.php">Log Out</a>
             </div>
         </nav>

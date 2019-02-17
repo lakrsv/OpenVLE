@@ -15,7 +15,7 @@ if (!$canManageProfile && !$canManageUsers) {
 
 $userId = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT);
 if (!$userId) {
-    exit("Get params not set");
+    $userId = $_SESSION["userid"];
 }
 
 if (!$canManageUsers) {
@@ -84,10 +84,56 @@ $userEmail = User::GetEmailFromId($userId);
                             <a class="nav-link" href="manage_roles.php">Manage Roles</a>
                         </li>
                     </ul>
+                    <a id="inbox" class="btn btn-default">
+                        <span class="fa-stack">
+                            <i class="fas fa-envelope fa-stack-2x text-white"></i>
+                            <i class="fa-stack-1x text-info text-right pr-1 pt-3">
+                                <h5>
+                                    <strong>
+                                        <!-- Amount in inbox -->
+                                        <!--+1-->
+                                    </strong>
+                                </h5>
+                            </i>
+                        </span>
+                    </a>
                     <a id="logout" class="btn btn-outline-danger pull-right my-2 my-sm-0" href="auth/log_out.php">Log Out</a>
                 </div>
             </nav>
         <?php } else { ?>
+            <nav class="navbar navbar-expand-md navbar-dark bg-dark static-top">
+                <a class="navbar-brand" href="user_home.php">OpenVLE</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapse" aria-controls="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="collapse">
+                    <ul class="navbar-nav mr-auto px-2">
+                        <li class="nav-item">
+                            <a class="nav-link" href="user_home.php">Your Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="manage_courses.php">Your Courses</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="view_profile.php">Your Profile</a>
+                        </li>
+                    </ul>
+                    <a id="inbox" class="btn btn-default">
+                        <span class="fa-stack">
+                            <i class="fas fa-envelope fa-stack-2x text-white"></i>
+                            <i class="fa-stack-1x text-info text-right pr-1 pt-3">
+                                <h5>
+                                    <strong>
+                                        <!-- Amount in inbox -->
+                                        <!--+1-->
+                                    </strong>
+                                </h5>
+                            </i>
+                        </span>
+                    </a>
+                    <a id="logout" class="btn btn-outline-danger pull-right my-2 my-sm-0" href="auth/log_out.php">Log Out</a>
+                </div>
+            </nav>
         <?php } ?>
 
         <?php
