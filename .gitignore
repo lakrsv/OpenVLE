@@ -8,3 +8,4 @@ nbdist/
 .nb-gradle/
 config/mysql_config.php
 auth/mysql_config.php
+db_backup/
