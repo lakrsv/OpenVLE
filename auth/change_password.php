@@ -57,7 +57,6 @@ class ChangePassword {
         $expires_at = $statement->fetchColumn();
 
         if (!$expires_at) {
-            echo 'No expires at';
             return FALSE;
         }
 
@@ -68,7 +67,6 @@ class ChangePassword {
         $now->format('Y-m-d H:i:s');
         
         if ($now > $expires_at) {
-            echo 'expires now';
             $connection = MysqlConfig::Connect();
             $sql = "DELETE FROM ResetPasswordTokens WHERE token1=:token1 AND token2=:token2 LIMIT 1";
             $statement = $connection->prepare($sql);
