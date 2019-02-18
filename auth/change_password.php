@@ -23,7 +23,7 @@ class ChangePassword {
 
     public static function GetResetPasswordLink($userId) {
         $token1 = bin2hex(random_bytes(8));
-        $token2 = ChangePassword::CreateToken($userId);
+        $token2 = bin2hex(ChangePassword::CreateToken($userId));
 
         $expires_at = new DateTime();
         $expires_at->format('Y-m-d H:i:s');
@@ -38,7 +38,7 @@ class ChangePassword {
         $statement->bindValue("expires_at", $expires_at->format('Y-m-d H:i:s'));
         $statement->execute();
 
-        $url = sprintf('change_password.php?%s', $_SERVER['HTTP_HOST'], http_build_query([
+        $url = sprintf('change_password.php?%s', http_build_query([
             'token1' => $token1,
             'token2' => $token2
         ]));
@@ -48,15 +48,16 @@ class ChangePassword {
 
     public static function AreTokensValid($token1, $token2) {
         $connection = MysqlConfig::Connect();
-        $sql = "SELECT expires_at FROM ResetPasswordTokens WHERE token1 = :token1 AND token2 = :token2 LIMIT 1";
+        $sql = "SELECT expires_at FROM ResetPasswordTokens WHERE token1=:token1 AND token2=:token2 LIMIT 1";
         $statement = $connection->prepare($sql);
-        $statement->bindValue("token1", $token1, PDO::PARAM_STR);
-        $statement->bindValue("token2", $token2, PDO::PARAM_STR);
+        $statement->bindValue("token1", $token1);
+        $statement->bindValue("token2", $token2);
         $statement->execute();
 
         $expires_at = $statement->fetchColumn();
 
         if (!$expires_at) {
+            echo 'No expires at';
             return FALSE;
         }
 
@@ -67,11 +68,12 @@ class ChangePassword {
         $now->format('Y-m-d H:i:s');
         
         if ($now > $expires_at) {
+            echo 'expires now';
             $connection = MysqlConfig::Connect();
-            $sql = "DELETE FROM ResetPasswordTokens WHERE token1 = :token1 AND token2 = :token2 LIMIT 1";
+            $sql = "DELETE FROM ResetPasswordTokens WHERE token1=:token1 AND token2=:token2 LIMIT 1";
             $statement = $connection->prepare($sql);
-            $statement->bindValue("token1", $token1, PDO::PARAM_STR);
-            $statement->bindValue("token2", $token2, PDO::PARAM_STR);
+            $statement->bindValue("token1", $token1);
+            $statement->bindValue("token2", $token2);
             $statement->execute();
 
             return FALSE;
@@ -88,8 +90,8 @@ class ChangePassword {
         $connection = MysqlConfig::Connect();
         $sql = "SELECT userId FROM ResetPasswordTokens WHERE token1 = :token1 AND token2 = :token2 LIMIT 1";
         $statement = $connection->prepare($sql);
-        $statement->bindValue("token1", $token1, PDO::PARAM_STR);
-        $statement->bindValue("token2", $token2, PDO::PARAM_STR);
+        $statement->bindValue("token1", $token1);
+        $statement->bindValue("token2", $token2);
         $statement->execute();
 
         return $statement->fetchColumn();
@@ -97,10 +99,10 @@ class ChangePassword {
 
     public static function DeleteTokens($token1, $token2) {
         $connection = MysqlConfig::Connect();
-        $sql = "DELETE FROM ResetPasswordTokens WHERE token1 = :token1 AND token2 = :token2 LIMIT 1";
+        $sql = "DELETE FROM ResetPasswordTokens WHERE token1=:token1 AND token2=:token2 LIMIT 1";
         $statement = $connection->prepare($sql);
-        $statement->bindValue("token1", $token1, PDO::PARAM_STR);
-        $statement->bindValue("token2", $token2, PDO::PARAM_STR);
+        $statement->bindValue("token1", $token1);
+        $statement->bindValue("token2", $token2);
         $statement->execute();
     }
 

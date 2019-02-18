@@ -1,8 +1,8 @@
 <?php
 require_once 'auth/change_password.php';
 
-$token1 = filter_input(INPUT_GET, "token1", FILTER_SANITIZE_STRING);
-$token2 = filter_input(INPUT_GET, "token2", FILTER_SANITIZE_STRING);
+$token1 = $_GET['token1'];
+$token2 = $_GET['token2'];
 
 if(session_status() == PHP_SESSION_NONE){
     session_start();
