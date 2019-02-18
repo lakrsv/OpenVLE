@@ -173,6 +173,14 @@ $userEmail = User::GetEmailFromId($userId);
                                 ?>
                             </div>
 
+                            <?php if ($canManageUsers || $canManageProfile) { ?>
+                                <div class="input-group mb-2">
+                                    <?php 
+                                    echo '<a href="redirect_to_change_password.php?userId='.$userId.'">Change Password</a>';
+                                    ?>
+                                </div>
+                            <?php } ?>
+
                             <?php if ($canManageProfile) { ?>
                                 <div class="input-group">
                                     <div class="custom-file">

@@ -173,8 +173,19 @@ class User {
         $statement->bindValue("userid", $userId, PDO::PARAM_STR);
         $statement->execute();
     }
-    
-    public static function ChangeUserProfilePicture($userId, $imageData){
+
+    public static function ChangePasswordForUser($userId, $newPassword) {
+        $newPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        $connection = MysqlConfig::Connect();
+        $sql = "UPDATE Users SET password=:password WHERE id=:userid";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("userid", $userId, PDO::PARAM_STR);
+        $statement->bindValue("password", $newPassword, PDO::PARAM_STR);
+        $statement->execute();
+    }
+
+    public static function ChangeUserProfilePicture($userId, $imageData) {
         $connection = MysqlConfig::Connect();
         $sql = "DELETE FROM UserProfilePicture WHERE userId=:userid; INSERT INTO UserProfilePicture (userId, img) VALUES (:userid, :img)";
         $statement = $connection->prepare($sql);
@@ -182,14 +193,14 @@ class User {
         $statement->bindValue("img", $imageData, PDO::PARAM_STR);
         $statement->execute();
     }
-    
-    public static function GetUserProfilePicture($userId){
+
+    public static function GetUserProfilePicture($userId) {
         $connection = MysqlConfig::Connect();
         $sql = "SELECT img FROM UserProfilePicture WHERE userId=:userid LIMIT 1;";
         $statement = $connection->prepare($sql);
         $statement->bindValue("userid", $userId, PDO::PARAM_STR);
         $statement->execute();
-        
+
         return $statement->fetchColumn();
     }
 
