@@ -58,10 +58,10 @@ require_once 'auth/change_password.php';
                                             email: $('#email').val()
                                         },
                                         success: function (data) {
-                                            alert("A password reset link has been sent to your e-mail!");
-                                            window.location = 'index.php';
                                         }
                                     });
+                                    alert("A password reset link has been sent to your e-mail!");
+                                    window.location = 'index.php';
                                 });
                             });
                         </script>
