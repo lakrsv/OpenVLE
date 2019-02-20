@@ -1,13 +1,5 @@
 <?php
 require_once 'auth/change_password.php';
-
-$token1 = $_GET['token1'];
-$token2 = $_GET['token2'];
-
-if (!ChangePassword::AreTokensValid($token1, $token2)) {
-    echo "This password reset request has expired or is not valid.";
-    die();
-}
 ?>
 
 <!doctype html>
@@ -42,55 +34,32 @@ if (!ChangePassword::AreTokensValid($token1, $token2)) {
             });
         </script>
 
-        <?php
-        echo '<div id="token1" style="display: none;">' . $token1 . '</div>'
-        ?>
-
-        <?php
-        echo '<div id="token2" style="display: none;">' . $token2 . '</div>'
-        ?>
-
         <div class="container">
             <div class="row">
                 <div class="col-xl-12 col-centered">
 
                     <div class="row justify-content-center">
-                        <form id="change-password" method="post">
+                        <form id="reset-password" method="post">
                             <div class="form-group">
-                                <label for="new-password">New Password</label>
-                                <input type="password" class="form-control" id="new-password" placeholder="Enter new password">
+                                <label for="email">Your Email Address</label>
+                                <input type="email" class="form-control" id="email" placeholder="Enter your email address">
                             </div>
-                            <div class="form-group">
-                                <label for="confirm-password">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirm-password" placeholder="Confirm new password">
-                            </div>
-                            <button type="submit" class="btn btn-primary">Change Password</button>
+                            <button type="submit" class="btn btn-primary">Send Reset Password Link</button>
                         </form>
 
                         <script>
                             $(document).ready(function () {
-                                $('#change-password').submit(function (e) {
+                                $('#reset-password').submit(function (e) {
                                     e.preventDefault();
                                     $.ajax({
                                         type: "POST",
                                         url: "auth/change_password.php",
                                         data: {
-                                            newPassword: $('#new-password').val(),
-                                            confirmPassword: $('#confirm-password').val(),
-                                            token1: $('#token1').text(),
-                                            token2: $('#token2').text()
+                                            email: $('#email').val()
                                         },
                                         success: function (data) {
-                                            data = $.parseJSON(data);
-                                            var $success = data.success;
-                                            var $message = data.message;
-                                            
-                                            if ($success) {
-                                                alert($message)
-                                                window.location = 'index.php';
-                                            } else {
-                                                alert($message);
-                                            }
+                                            alert("A password reset link has been sent to your e-mail!");
+                                            window.location = 'index.php';
                                         }
                                     });
                                 });

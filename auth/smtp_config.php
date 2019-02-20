@@ -32,9 +32,8 @@ class SmtpConfig {
 
         $mailer->setFrom(SmtpConfig::$username, 'Open VLE');
         $mailer->addAddress($email);
-
         $mailer->Subject = $subject;
-        $mailer->Body = $body;
+        $mailer->msgHTML($body);
         $mailer->send();
     }
 

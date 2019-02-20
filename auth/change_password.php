@@ -3,6 +3,7 @@
 require_once 'mysql_config.php';
 require_once 'smtp_config.php';
 require_once 'login.php';
+require_once __DIR__ . '/../classes/passwordConstants.php';
 
 class ChangePassword {
 
@@ -16,7 +17,7 @@ class ChangePassword {
         $body = "<p>You asked us to reset your password. You can find the link to reset your password below. ";
         $body .= "If this wasn't you, you can ignore this email</p>";
         $body .= "<p>Your password reset link:</br>";
-        $body .= sprintf('<a href="%s">%s</a></p>', $url, "Click to reset your password");
+        $body .= sprintf('<a href="http://%s/OpenVLE/%s">%s</a></p>', $_SERVER['HTTP_HOST'], $url, "Click to reset your password");
 
         SmtpConfig::SendMail($email, $subject, $body);
     }
@@ -37,6 +38,8 @@ class ChangePassword {
         $statement->bindValue("token2", $token2);
         $statement->bindValue("expires_at", $expires_at->format('Y-m-d H:i:s'));
         $statement->execute();
+
+        ChangePassword::DeleteOldTokens($token1, $token2);
 
         $url = sprintf('change_password.php?%s', http_build_query([
             'token1' => $token1,
@@ -60,12 +63,12 @@ class ChangePassword {
             return FALSE;
         }
 
-        $expires_at = strtotime($expires_at);
+        $expires_at = date_create_from_format('Y-m-d H:i:s', $expires_at);
 
 
         $now = new DateTime();
         $now->format('Y-m-d H:i:s');
-        
+
         if ($now > $expires_at) {
             $connection = MysqlConfig::Connect();
             $sql = "DELETE FROM ResetPasswordTokens WHERE token1=:token1 AND token2=:token2 LIMIT 1";
@@ -95,6 +98,15 @@ class ChangePassword {
         return $statement->fetchColumn();
     }
 
+    public static function DeleteOldTokens($newToken1, $newToken2) {
+        $connection = MysqlConfig::Connect();
+        $sql = "DELETE FROM ResetPasswordTokens WHERE token1 NOT IN (:newtoken1) AND token2 NOT IN (:newtoken2)";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("newtoken1", $newToken1);
+        $statement->bindValue("newtoken2", $newToken2);
+        $statement->execute();
+    }
+
     public static function DeleteTokens($token1, $token2) {
         $connection = MysqlConfig::Connect();
         $sql = "DELETE FROM ResetPasswordTokens WHERE token1=:token1 AND token2=:token2 LIMIT 1";
@@ -111,31 +123,56 @@ class ChangePassword {
 
 }
 
-if (session_status() != PHP_SESSION_ACTIVE || !isset($_SESSION['token1'], $_SESSION['token2'])) {
+$email = filter_input(INPUT_POST, "email", FILTER_VALIDATE_EMAIL);
+if ($email) {
+    $userId = User::GetUserIdFromEmail($email);
+    ChangePassword::SendResetPasswordEmail($userId);
+}
+
+if (!isset($_POST['token1'], $_POST['token2'])) {
     return;
 }
 
-$token1 = $_SESSION['token1'];
-$token2 = $_SESSION['token2'];
+$token1 = $_POST['token1'];
+$token2 = $_POST['token2'];
+
+$response = array();
 
 if (!ChangePassword::AreTokensValid($token1, $token2)) {
+    $response['success'] = FALSE;
+    $response['message'] = 'This password reset request has expired. Please try again.';
+    echo json_encode($response);
     die();
 }
 
 $newPassword = filter_input(INPUT_POST, "newPassword", FILTER_SANITIZE_STRING);
 $confirmPassword = filter_input(INPUT_POST, "confirmPassword", FILTER_SANITIZE_STRING);
 
-if ($newPassword != $confirmPassword) {
-    echo 'Passwords do not match';
+if (strcmp($newPassword, $confirmPassword)) {
+    $response['success'] = FALSE;
+    $response['message'] = 'The supplied passwords do not match';
+    echo json_encode($response);
+    die();
+}
+
+if (strlen($newPassword) < passwordConstants::$MIN_PASSWORD_LENGTH) {
+    $response['success'] = FALSE;
+    $response['message'] = "Password must be atleast " . passwordConstants::$MIN_PASSWORD_LENGTH . " characters";
+    echo json_encode($response);
     die();
 }
 
 $userId = ChangePassword::GetUserIdFromTokens($token1, $token2);
 if (!$userId) {
-    echo 'Bad user';
+    $response['success'] = FALSE;
+    $response['message'] = "Something went wrong when trying to reset your password";
+    echo json_encode($response);
     die();
 }
 
 User::ChangePasswordForUser($userId, $newPassword);
 ChangePassword::DeleteTokens($token1, $token2);
-echo 'Success';
+
+$response['success'] = TRUE;
+$response['message'] = "Successfully changed password! Please login to continue";
+echo json_encode($response);

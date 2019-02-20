@@ -1,6 +1,7 @@
 <?php
 
 require_once 'mysql_config.php';
+require_once __DIR__ . '/../classes/passwordConstants.php';
 
 class User {
 

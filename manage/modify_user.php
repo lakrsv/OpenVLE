@@ -67,9 +67,9 @@ function TryDeleteUser($userId) {
 function TryAddUser($email, $name, $password) {
     $response = array();
 
-    if (strlen($password) < 6) {
+    if (strlen($password) < passwordConstants::$MIN_PASSWORD_LENGTH) {
         $response['success'] = FALSE;
-        $response['message'] = "Password must be atleast 6 characters";
+        $response['message'] = "Password must be atleast ".passwordConstants::$MIN_PASSWORD_LENGTH." characters";
         echo json_encode($response);
         return FALSE;
     }
