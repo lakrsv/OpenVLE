@@ -2,7 +2,7 @@
 require_once 'header/auth_header.php';
 require_once 'auth/login.php';
 require_once 'classes/course.php';
-require_once 'classes/contactDetails.php';
+require_once 'classes/courseSectionContent.php';
 
 // TODO - Change this to allow user to change their profile
 $canManageCourses = $userRole->HasPermission("manage_courses");
@@ -137,7 +137,7 @@ if (!$courseId) {
         ?>
 
         <!-- Singular course set -->
-        <?php if ($course) { ?>
+        <?php if ($courseId) { ?>
             <div class="container-fluid mt-2">
                 <div class="col-12">
                     <?php foreach ($courseSections as $section) { ?>
@@ -170,7 +170,13 @@ if (!$courseId) {
 
                                         <?php echo '<div id="content-collapse-' . $content->GetId() . '" class="collapse show" aria-labelledby="content-header-' . $content->GetId() . '" data-parent="#contents">' ?>
                                         <div class="card-body">
-                                            Content contents :)
+                                            <?php if ($content->GetType() == CourseSectionContent::Text) { ?>
+                                                <?php echo $content->GetData() ?>
+                                            <?php } else if ($content->GetType() == CourseSectionContent::PDF) { ?>
+                                                <!-- Not Implemented -->
+                                            <?php } else if ($content->GetType() == CourseSectionContent::Quiz) { ?>
+                                                <!-- Not Implemented -->
+                                            <?php } ?>
                                         </div>
                                     </div>
                                 </div>

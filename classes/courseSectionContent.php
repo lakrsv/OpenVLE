@@ -12,6 +12,11 @@
  * @author lakrs
  */
 class CourseSectionContent {
+    
+    const Text = 1;
+    const PDF = 2;
+    const Quiz = 3;
+    
     private $id;
     private $sectionId;
     private $name;
@@ -35,6 +40,14 @@ class CourseSectionContent {
     }
     
     public function GetData(){
+        switch ($this->type){
+            case CourseSectionContent::Text:
+                return $this->data;
+            case CourseSectionContent::PDF;
+                break;
+            case CourseSectionContent::Quiz;
+                break;
+        }
         return $this->data;
     }
     

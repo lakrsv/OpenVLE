@@ -9,3 +9,4 @@ nbdist/
 config/mysql_config.php
 auth/mysql_config.php
 db_backup/
+db_section_contents/
