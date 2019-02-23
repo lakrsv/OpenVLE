@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../auth/mysql_config.php';
+require_once 'courseSection.php';
 
 class Course {
 
@@ -24,6 +25,25 @@ class Course {
 
     public function GetDescription() {
         return $this->description;
+    }
+    
+    public function GetSections(){
+         $connection = MysqlConfig::Connect();
+        $sql = "SELECT * FROM CourseSections WHERE courseId = :id";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("id", $this->id);
+        $statement->execute();
+
+        $sections = array();
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+            $courseId = $row['courseId'];
+            $name = $row['name'];
+
+            $section = new CourseSection($id, $courseId, $name);
+            array_push($sections, $section);
+        }
+        return $sections;
     }
 
     public static function GetAll() {
@@ -90,6 +110,22 @@ class Course {
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
         $id = $row['id'];
+        $description = $row['description'];
+
+        $course = new Course($id, $name, $description);
+
+        return $course;
+    }
+    
+      public static function GetCourseWithId($id) {
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT * FROM Courses WHERE id = :id LIMIT 1;";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("id", $id, PDO::PARAM_STR);
+        $statement->execute();
+
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
+        $name = $row['name'];
         $description = $row['description'];
 
         $course = new Course($id, $name, $description);

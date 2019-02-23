@@ -97,7 +97,7 @@ if (!$userRole->HasPermission("manage_courses")) {
                             echo $course->GetName();
                             echo '</div>';
                             echo '<div class="col-2 text-right">';
-                            echo '<a class="far fa-edit text-dark no-decoration editcourse" href="edit_course.php?id=' . $course->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Edit course"></a>';
+                            echo '<a class="far fa-edit text-dark no-decoration editcourse" href="view_course.php?id=' . $course->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Edit course"></a>';
                             echo '</div>';
                             echo '</div>';
                             echo '</div>';

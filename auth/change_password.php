@@ -15,9 +15,10 @@ class ChangePassword {
         $subject = "OpenVLE - Your Password Reset Link";
 
         $body = "<p>You asked us to reset your password. You can find the link to reset your password below. ";
-        $body .= "If this wasn't you, you can ignore this email</p>";
-        $body .= "<p>Your password reset link:</br>";
+        $body .= "If this wasn't you, you can ignore this email.</p>";
+        $body .= "<p>Your password reset link: </br>";
         $body .= sprintf('<a href="http://%s/OpenVLE/%s">%s</a></p>', $_SERVER['HTTP_HOST'], $url, "Click to reset your password");
+        $body .= "<br><strong>This link expires in 15 minutes.</strong>";
 
         SmtpConfig::SendMail($email, $subject, $body);
     }
