@@ -47,4 +47,22 @@ class CourseSection {
         return $contents;
     }
 
+    public static function SectionWithIdExists($sectionId) {
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT id FROM CourseSections WHERE id = :sectionid LIMIT 1";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("sectionid", $sectionId);
+        $statement->execute();
+
+        return count($statement->fetchAll()) > 0 ? TRUE : FALSE;
+    }
+
+    public static function DeleteSectionWithId($sectionId) {
+        $connection = MysqlConfig::Connect();
+        $sql = "DELETE FROM CourseSections WHERE id = :sectionid;";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("sectionid", $sectionId, PDO::PARAM_STR);
+        $statement->execute();
+    }
+
 }
