@@ -8,6 +8,7 @@ require_once __DIR__ . '/../header/auth_header.php';
 
 $action = filter_input(INPUT_POST, "action", FILTER_SANITIZE_STRING);
 
+$canManageCourses = $userRole->HasPermission("manage_courses");
 $canAddAssignment = $userRole->HasPermission("add_assignment");
 $canAddQuiz = $userRole->HasPermission("add_quiz");
 $canAddResource = $userRole->HasPermission("add_resource");
@@ -21,7 +22,7 @@ if (!$action) {
 
 switch ($action) {
     case 'delete':
-        if (!$userRole->HasPermission("manage_courses")) {
+        if (!$canManageCourses) {
             header("Location: user-home.php");
         }
         $course = filter_input(INPUT_POST, "course", FILTER_SANITIZE_STRING);
@@ -30,7 +31,7 @@ switch ($action) {
         }
         return TryDeleteCourse($course);
     case 'add':
-        if (!$userRole->HasPermission("manage_courses")) {
+        if (!$canManageCourses) {
             header("Location: user-home.php");
         }
         $course = filter_input(INPUT_POST, "course", FILTER_SANITIZE_STRING);

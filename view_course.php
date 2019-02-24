@@ -138,6 +138,27 @@ if (!$courseId) {
         echo '<div id="courseid" style="display: none;">' . $courseId . '</div>'
         ?>
 
+        <!--Confirmation Modal -->
+        <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmationModalLabel">Are you sure?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        You are about to delete this role! Are you sure?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                        <button id="confirmation-modal-button" type="submit" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Singular course set -->
         <?php if ($courseId) { ?>
             <div class="jumbotron jumbotron-fluid">
@@ -164,7 +185,7 @@ if (!$courseId) {
                                 <?php
                                 if ($canAddSection) {
                                     echo '<div class="col-2 text-right">';
-                                    echo '<a class="far fa-times-circle text-danger no-decoration deletesection" id=delete-section-' . $section->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Delete section"></a>';
+                                    echo '<a class="far fa-times-circle text-danger no-decoration deletesection" id="delete-section-' . $section->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Delete section"></a>';
                                     echo '</div>';
                                 }
                                 ?>
@@ -191,7 +212,7 @@ if (!$courseId) {
                                             <?php
                                             if ($canAddContent) {
                                                 echo '<div class="col-2 text-right">';
-                                                echo '<a class="far fa-times-circle text-danger no-decoration deletecontent" id=delete-content-' . $content->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Delete content"></a>';
+                                                echo '<a class="far fa-times-circle text-danger no-decoration deletecontent" id="delete-content-' . $content->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Delete content"></a>';
                                                 echo '</div>';
                                             }
                                             ?>
@@ -286,7 +307,6 @@ if (!$courseId) {
                             section: sectionId
                         },
                         success: function (data) {
-                            alert(data);
                             data = $.parseJSON(data);
                             var $success = data.success;
                             var $message = data.message;
@@ -296,7 +316,7 @@ if (!$courseId) {
                             if ($success) {
                                 $alert.removeClass("alert-danger");
                                 $alert.addClass("alert-success");
-                                $alert.find("#roleAlertBody").html(function () {
+                                $alert.find("#courseAlertBody").html(function () {
                                     return "<strong>Success!</strong> " + $message;
                                 });
                                 $('#sections-' + sectionId).remove();
@@ -348,7 +368,6 @@ if (!$courseId) {
                             content: contentId
                         },
                         success: function (data) {
-                            alert(data);
                             data = $.parseJSON(data);
                             var $success = data.success;
                             var $message = data.message;
@@ -358,10 +377,10 @@ if (!$courseId) {
                             if ($success) {
                                 $alert.removeClass("alert-danger");
                                 $alert.addClass("alert-success");
-                                $alert.find("#roleAlertBody").html(function () {
+                                $alert.find("#courseAlertBody").html(function () {
                                     return "<strong>Success!</strong> " + $message;
                                 });
-                                $('#content-' + contentId).remove();
+                                $('#contents-' + contentId).remove();
 
                             } else {
                                 $alert.removeClass("alert-success");
@@ -376,27 +395,6 @@ if (!$courseId) {
             });
         </script>
     <?php } ?>
-
-    <!--Confirmation Modal -->
-    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationModalLabel">Are you sure?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    You are about to delete this role! Are you sure?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                    <button id="confirmation-modal-button" type="submit" class="btn btn-primary" data-dismiss="modal">Yes</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
