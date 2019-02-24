@@ -12,6 +12,8 @@ $canAddResource = $userRole->HasPermission("add_resource");
 $canViewContent = $userRole->HasPermission("view_content");
 $userCourses = Course::GetCoursesForUser($_SESSION['userid']);
 
+$canAddSection = $canManageCourses || $canAddAssignment || $canAddQuiz || $canAddResource;
+$canAddContent = $canManageCourses || $canAddAssignment || $canAddQuiz || $canAddResource;
 
 if (!$canManageCourses && !$canViewContent) {
     header("Location: user-home.php");
@@ -138,37 +140,64 @@ if (!$courseId) {
 
         <!-- Singular course set -->
         <?php if ($courseId) { ?>
+            <div class="jumbotron jumbotron-fluid">
+                <div class="container">
+                    <h1 class="display-4"><?php echo $course->GetName() ?></h1>
+                    <p class="lead"><?php echo $course->GetDescription() ?></p>
+                </div>
+            </div>
             <div class="container-fluid mt-2">
                 <div class="col-12">
                     <?php foreach ($courseSections as $section) { ?>
-                        <div id="sections">
+                        <div id="sections-<?php echo $section->GetId() ?>">
                             <div class="card">
-                                <?php echo '<div class="card-header bg-dark" id="section-header-' . $section->GetId() . '">' ?>
-                                <h5 class="mb-0">
-                                    <?php echo '<button class="btn btn-link text-white" data-toggle="collapse" data-target="#section-collapse-' . $section->GetId() . '" aria-expanded="true" aria-controls="section-collapse-' . $section->GetId() . '">' ?>
-                                    <?php echo $section->GetName(); ?>
-                                    </button>
-                                </h5>
+                                <?php echo '<div class="card-header bg-dark row mx-0" id="section-header-' . $section->GetId() . '">' ?>
+                                <div class="col-10">
+
+                                    <h5 class="mb-0">
+                                        <?php echo '<button class="btn btn-link text-white" data-toggle="collapse" data-target="#section-collapse-' . $section->GetId() . '" aria-expanded="true" aria-controls="section-collapse-' . $section->GetId() . '">' ?>
+                                        <?php echo $section->GetName(); ?>
+                                        </button>
+                                    </h5>
+                                </div>
+
+                                <?php
+                                if ($canAddSection) {
+                                    echo '<div class="col-2 text-right">';
+                                    echo '<a class="far fa-times-circle text-danger no-decoration deletesection" id=delete-section' . $section->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Delete content"></a>';
+                                    echo '</div>';
+                                }
+                                ?>
                             </div>
 
                             <?php
                             $sectionContents = $section->GetContents();
                             ?>
 
-                            <?php echo '<div id="section-collapse-' . $section->GetId() . '" class="collapse show bg-light" aria-labelledby="section-header-' . $section->GetId() . '" data-parent="#sections">' ?>
+                            <?php echo '<div id="section-collapse-' . $section->GetId() . '" class="collapse show bg-light" aria-labelledby="section-header-' . $section->GetId() . '" data-parent="#sections-' . $section->GetId() . '">' ?>
                             <div class="card-body">
                                 <?php foreach ($sectionContents as $content) { ?>
-                                    <div id="contents">
+                                    <div id="contents-<?php echo $content->GetId() ?>">
                                         <div class="card">
-                                            <?php echo '<div class="card-header bg-light" id="content-header-' . $content->GetId() . '">' ?>
-                                            <h5 class="mb-0">
-                                                <?php echo '<button class="btn btn-link text-dark" data-toggle="collapse" data-target="#content-collapse-' . $content->GetId() . '" aria-expanded="true" aria-controls="content-collapse-' . $content->GetId() . '">' ?>
-                                                <?php echo $content->GetName(); ?>
-                                                </button>
-                                            </h5>
+                                            <?php echo '<div class="card-header bg-light row mx-0" id="content-header-' . $content->GetId() . '">' ?>
+                                            <div class="col-10">
+                                                <h5 class="mb-0">
+
+                                                    <?php echo '<button class="btn btn-link text-dark" data-toggle="collapse" data-target="#content-collapse-' . $content->GetId() . '" aria-expanded="true" aria-controls="content-collapse-' . $content->GetId() . '">' ?>
+                                                    <?php echo $content->GetName(); ?>
+                                                    </button>
+                                                </h5>
+                                            </div>
+                                            <?php
+                                            if ($canAddContent) {
+                                                echo '<div class="col-2 text-right">';
+                                                echo '<a class="far fa-times-circle text-danger no-decoration deletecontent" id=delete-content' . $content->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Delete content"></a>';
+                                                echo '</div>';
+                                            }
+                                            ?>
                                         </div>
 
-                                        <?php echo '<div id="content-collapse-' . $content->GetId() . '" class="collapse show" aria-labelledby="content-header-' . $content->GetId() . '" data-parent="#contents">' ?>
+                                        <?php echo '<div id="content-collapse-' . $content->GetId() . '" class="collapse show" aria-labelledby="content-header-' . $content->GetId() . '" data-parent="#contents-' . $content->GetId() . '">' ?>
                                         <div class="card-body">
                                             <?php if ($content->GetType() == CourseSectionContent::Text) { ?>
                                                 <?php echo $content->GetData() ?>
@@ -182,20 +211,57 @@ if (!$courseId) {
                                 </div>
                             </div>
                         <?php } ?>
+                        <?php if ($canAddContent) { ?>
+                            <br>
+                            <div>
+                                <button id="add-content-<?php echo $section->GetId() ?>" class="btn btn-primary" type="button">Add Section Content</button>
+                            </div>
+                        <?php } ?>
                     </div>
                 </div>
             </div>
-        </div>
+        <?php } ?>      
+        <br>
+        <?php if ($canAddSection) { ?>
+            <div>
+                <button id="add-section-<?php echo $course->GetId() ?>" class="btn btn-primary" type="button">Add Section</button>
+            </div>
+        <?php } ?>
+        <!-- Show all courses -->
+    <?php } else { ?>
     <?php } ?>
+
+    <div class="row mt-2">
+        <div class="col-12 text-left">
+            <a class="btn btn-secondary" href="javascript:history.go(-1)">Back</a>
+        </div>                         
     </div>
-    </div>
-    <!-- Show all courses -->
-<?php } else { ?>
-<?php } ?>
 
+    <!-- Add Section Script -->
+    <?php if ($canAddSection) { ?>
+        <script>
+        </script>
+    <?php } ?>
 
+    <!-- Add Content Script -->
+    <?php if ($canAddContent) { ?>
+        <script>
+        </script>
+    <?php } ?>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <!-- Delete Section Script -->
+    <?php if ($canAddSection) { ?>
+        <script>
+        </script>
+    <?php } ?>
+
+    <!-- Delete Content Script -->
+    <?php if ($canAddContent) { ?>
+        <script>
+        </script>
+    <?php } ?>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 </body>
 </html>
