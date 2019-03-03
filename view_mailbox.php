@@ -3,33 +3,24 @@ require_once 'header/auth_header.php';
 require_once 'auth/login.php';
 require_once 'classes/course.php';
 require_once 'classes/courseSectionContent.php';
+require_once 'classes/mailBox.php';
 
-// TODO - Change this to allow user to change their profile
-$canManageCourses = $userRole->HasPermission("manage_courses");
-$canAddAssignment = $userRole->HasPermission("add_assignment");
-$canAddQuiz = $userRole->HasPermission("add_quiz");
-$canAddResource = $userRole->HasPermission("add_resource");
 $canViewContent = $userRole->HasPermission("view_content");
-$userCourses = Course::GetCoursesForUser($_SESSION['userid']);
+$canManageCourses = $userRole->HasPermission("manage_courses");
 
-$canAddSection = $canManageCourses || $canAddAssignment || $canAddQuiz || $canAddResource;
-$canAddContent = $canManageCourses || $canAddAssignment || $canAddQuiz || $canAddResource;
-
-if (!$canManageCourses && !$canViewContent) {
+if (!$canViewContent) {
     header("Location: user-home.php");
 }
 
-$courseId = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT);
-$course;
-if (!$courseId) {
-    // View all courses?
-} else {
-    $course = Course::GetCourseWithId($courseId);
-    $courseSections = $course->GetSections();
-    if (!$canManageCourses && !in_array($course, $userCourses)) {
-        header("Location: view_course.php");
-    }
-}
+$to = filter_input(INPUT_GET, "to", FILTER_SANITIZE_NUMBER_INT);
+$unread = filter_input(INPUT_GET, "unread", FILTER_SANITIZE_NUMBER_INT);
+$read = filter_input(INPUT_GET, "read", FILTER_SANITIZE_NUMBER_INT);
+$sent = filter_input(INPUT_GET, "sent", FILTER_SANITIZE_NUMBER_INT);
+
+$showUnread = $unread || (!$to && !$read && !$sent);
+$showRead = $read;
+$showSent = $sent;
+$showTo = $to;
 ?>
 
 <!doctype html>
@@ -90,6 +81,7 @@ if (!$courseId) {
                                     <strong>
                                         <!-- Amount in inbox -->
                                         <!--+1-->
+                                        <?php echo MailBox::GetUnreadInboxCountForUser($_SESSION['userid']) ?>
                                     </strong>
                                 </h5>
                             </i>
@@ -121,6 +113,7 @@ if (!$courseId) {
                                     <strong>
                                         <!-- Amount in inbox -->
                                         <!--+1-->
+                                        <?php echo MailBox::GetUnreadInboxCountForUser($_SESSION['userid']) ?>
                                     </strong>
                                 </h5>
                             </i>
@@ -131,7 +124,123 @@ if (!$courseId) {
             </nav>
         <?php } ?>
 
+        <div class="container-fluid row mt-2">
+            <!-- Sidebar -->
+            <div class="col-2">
+                <!-- Categories / Folders -->
+                <h5 class="card-title">Mail</h5>
+                <row>
+                    <div class="list-group">
+                        <a href="?unread='1'" class="list-group-item d-flex justify-content-between align-items-center list-group-item-action <?php
+                        if ($showUnread) {
+                            echo "active";
+                        }
+                        ?>">
+                            Unread
+                            <span class="badge badge-light badge-pill">
+                                <?php
+                                echo MailBox::GetUnreadInboxCountForUser($_SESSION['userid']);
+                                ?>
+                            </span>
+                        </a>
+                        <a href="?read='1'" class="list-group-item d-flex justify-content-between align-items-center list-group-item-action <?php
+                        if ($showRead) {
+                            echo "active";
+                        }
+                        ?>">
+                            Read
+                        </a>
+                        <a href="?sent='1'" class="list-group-item d-flex justify-content-between align-items-center list-group-item-action <?php
+                        if ($showSent) {
+                            echo "active";
+                        }
+                        ?>">
+                            Sent
+                        </a>
+                    </div>
+                </row>
+                <hr>
+                <!-- Contacts -->
+                <h5 class="card-title">Contacts</h5>
+                <row>
+                    <div class="list-group contact-list">
+                        <?php
+                        $allUsers = User::GetAll();
+                        foreach ($allUsers as $user) {
+                            echo '<a href="view_mailbox.php?to=' . $user->GetId() . '" class="list-group-item d-flex justify-content-between align-items-center list-group-item-action">';
+                            echo $user->GetName();
+                            echo '</a>';
+                        }
+                        ?>
+                    </div>
+                </row>
+            </div>
+            <!-- Inbox (Filtered Or Send Mail) -->
+            <div class="col-10">
+                <?php if ($showUnread || $showRead || $showSent) { ?>
+                    <h5 class="card-title">Inbox</h5>
+                    <?php
+                    $allMail;
+                    if ($showUnread) {
+                        $allMail = MailBox::GetUnreadMailForUser($_SESSION['userid']);
+                    } else if ($showRead) {
+                        $allMail = MailBox::GetReadMailForUser($_SESSION['userid']);
+                    } else if ($showSent) {
+                        $allMail = MailBox::GetSentMailForUser($_SESSION['userid']);
+                    }
+                    ?>
+
+                    <div class="accordion" id="mail-accordion">
+                        <?php
+                        foreach ($allMail as $mail) {
+                            echo '<div class="card">';
+
+                            echo '<div class="card-header" id="mail-header-' . $mail->GetId() . '"';
+                            echo '<h2 class="mb-0">';
+                            echo '<button class="btn btn-link col-12" type="button" data-toggle="collapse" data-target="#collapse-mail-' . $mail->GetId() . '" aria-expanded="true" aria-controls="collapse-mail-' . $mail->GetId() . '">';
+                            echo '<div class="row text-dark">';
+                            echo '<div class="col-2 text-left">';
+                            $mailUserId = $showSent ? $mail->GetToUserId() : $mail->GetFromUserId();
+                            echo User::GetUsernameFromId($mailUserId);
+                            echo '</div>';
+                            echo '<div class="col-8 text-left">';
+                            echo $mail->GetTitle();
+                            echo '</div>';
+                            echo '<div class="col-2 text-right">';
+                            echo $mail->GetSendTime();
+                            echo '</div>';
+                            echo '</button>';
+                            echo '</h2>';
+                            echo '</div>';
+                            echo '</div>';
+
+                            echo '<div id="collapse-mail-' . $mail->GetId() . '" class="collapse" aria-labelledby="mail-header-' . $mail->GetId() . '" data-parent="#mail-accordion"';
+                            echo '<div class="card-body">';
+                            echo $mail->GetMessage();
+                            echo '</div>';
+                            echo '</div>';
+                        }
+                        ?>
+                    </div>
+                <?php } else if ($showTo) { ?>
+                <?php } ?>
+            </div>
+        </div>
+
+        <div class="container-fluid mt-2">
+            <hr>
+            <div class="col-12 text-left">
+                <a class="btn btn-secondary" href="javascript:history.go(-1)">Back</a>
+            </div>                         
+        </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
     </body>
+    
+    <?php 
+    if($showUnread){
+        // Clear unread email
+        MailBox::SetAllReadForUser($_SESSION['userid']);
+    }
+    ?>
 </html>

@@ -1,6 +1,7 @@
 <?php
 require_once 'header/auth_header.php';
 require_once 'auth/login.php';
+require_once 'classes/mailBox.php';
 
 if (!$userRole->HasPermission("manage_users")) {
     header("Location: user-home.php");
@@ -64,6 +65,7 @@ if (!$userRole->HasPermission("manage_users")) {
                                 <strong>
                                     <!-- Amount in inbox -->
                                     <!--+1-->
+                                    <?php echo MailBox::GetUnreadInboxCountForUser($_SESSION['userid']) ?>
                                 </strong>
                             </h5>
                         </i>

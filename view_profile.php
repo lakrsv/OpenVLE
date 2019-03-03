@@ -3,6 +3,7 @@ require_once 'header/auth_header.php';
 require_once 'auth/login.php';
 require_once 'classes/course.php';
 require_once 'classes/contactDetails.php';
+require_once 'classes/mailBox.php';
 
 // TODO - Change this to allow user to change their profile
 $canManageProfile = $userRole->HasPermission("manage_profile");
@@ -92,6 +93,7 @@ $userEmail = User::GetEmailFromId($userId);
                                     <strong>
                                         <!-- Amount in inbox -->
                                         <!--+1-->
+                                        <?php echo MailBox::GetUnreadInboxCountForUser($_SESSION['userid']) ?>
                                     </strong>
                                 </h5>
                             </i>
@@ -123,6 +125,7 @@ $userEmail = User::GetEmailFromId($userId);
                                     <strong>
                                         <!-- Amount in inbox -->
                                         <!--+1-->
+                                        <?php echo MailBox::GetUnreadInboxCountForUser($_SESSION['userid']) ?>
                                     </strong>
                                 </h5>
                             </i>
@@ -172,8 +175,8 @@ $userEmail = User::GetEmailFromId($userId);
 
                             <?php if ($canManageUsers || $canManageProfile) { ?>
                                 <div class="input-group mb-2">
-                                    <?php 
-                                    echo '<a href="redirect_to_change_password.php?userId='.$userId.'">Change Password</a>';
+                                    <?php
+                                    echo '<a href="redirect_to_change_password.php?userId=' . $userId . '">Change Password</a>';
                                     ?>
                                 </div>
                             <?php } ?>

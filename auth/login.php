@@ -234,7 +234,6 @@ class User {
 
         return $statement->fetchColumn();
     }
-
 }
 
 if (isset($_POST['email'], $_POST['password'])) {

@@ -3,6 +3,7 @@ require_once 'header/auth_header.php';
 require_once 'auth/login.php';
 require_once 'classes/course.php';
 require_once 'classes/courseSectionContent.php';
+require_once 'classes/mailBox.php';
 
 // TODO - Change this to allow user to change their profile
 $canManageCourses = $userRole->HasPermission("manage_courses");
@@ -90,6 +91,7 @@ if (!$courseId) {
                                     <strong>
                                         <!-- Amount in inbox -->
                                         <!--+1-->
+                                        <?php echo MailBox::GetUnreadInboxCountForUser($_SESSION['userid']) ?>
                                     </strong>
                                 </h5>
                             </i>
@@ -121,6 +123,7 @@ if (!$courseId) {
                                     <strong>
                                         <!-- Amount in inbox -->
                                         <!--+1-->
+                                        <?php echo MailBox::GetUnreadInboxCountForUser($_SESSION['userid']) ?>
                                     </strong>
                                 </h5>
                             </i>
@@ -195,7 +198,7 @@ if (!$courseId) {
                                             <tbody>
                                                 <?php
                                                 foreach ($courseUserIds as $user) {
-                                                    if($user == $_SESSION['userid']){
+                                                    if ($user == $_SESSION['userid']) {
                                                         continue;
                                                     }
                                                     if ($showPrivilegedOnly && !Course::IsPrivilegedCourseUser($course->GetId(), $user)) {
