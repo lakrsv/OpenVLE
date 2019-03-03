@@ -273,13 +273,56 @@ if (!$courseId) {
     </div>
     <!-- Show all courses -->
 <?php } else { ?>
+    <!-- If We are Admin, show all courses -->
+    <?php
+    if ($canManageCourses) {
+        $userCourses = Course::GetAll();
+    }
+    ?>
+    <div class="container-fluid mt-2">
+        <div id="courseTable" class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Course</th>
+                        <th scope="col">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    foreach ($userCourses as $course) {
+                        echo '<tr id=course-' . $course->GetId() . '>';
+                        echo '<th scope="row">';
+                        echo '<div class="container">';
+                        echo '<div class="row">';
+                        echo '<div class="col-10 coursename">';
+                        echo $course->GetName();
+                        echo '</div>';
+                        echo '<div class="col-2 text-right">';
+                        echo '<a class="fas fa-sign-in-alt text-dark no-decoration editcourse" href="view_course.php?id=' . $course->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Enter course"></a>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</th>';
+                        echo '<td id="coursedescription">';
+                        echo $course->GetDescription();
+                        echo '</td>';
+                        echo '</tr>';
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 <?php } ?>
 
-<div class="row mt-2">
-    <div class="col-12 text-left">
-        <a class="btn btn-secondary" href="javascript:history.go(-1)">Back</a>
-    </div>                         
-</div>
+<?php if ($courseId) { ?>
+    <div class="row mt-2">
+        <div class="col-12 text-left">
+            <a class="btn btn-secondary" href="javascript:history.go(-1)">Back</a>
+        </div>                         
+    </div>
+<?php } ?>
 
 <!-- Add Section Script -->
 <?php if ($canAddSection) { ?>

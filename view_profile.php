@@ -112,7 +112,7 @@ $userEmail = User::GetEmailFromId($userId);
                             <a class="nav-link" href="user_home.php">Your Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="manage_courses.php">Your Courses</a>
+                            <a class="nav-link" href="view_course.php">Your Courses</a>
                         </li>
                         <li class="nav-item active">
                             <a class="nav-link" href="view_profile.php">Your Profile</a>
