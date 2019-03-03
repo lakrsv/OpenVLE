@@ -254,7 +254,7 @@ $userEmail = User::GetEmailFromId($userId);
                                 <?php if ($canManageProfile) { ?>
                                     <a class="btn btn-primary" href="#" id="save-changes-button">Save Changes</a>
                                 <?php } ?>
-                                <?php if ($canManageProfile && !Role::GetRoleFromUserId($userId)->HasPermission("admin")) { ?>
+                                <?php if ($canManageUsers && $canManageProfile && !Role::GetRoleFromUserId($userId)->HasPermission("admin")) { ?>
                                     <a class="btn btn-danger" href="#" id="delete-user-button">Delete User</a>
                                 <?php } ?>
                             </div>                         
