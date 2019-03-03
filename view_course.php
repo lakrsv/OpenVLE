@@ -253,249 +253,245 @@ if (!$courseId) {
                     </div>
                 </div>
             </div>
-        <?php } ?>      
-        <br>
-        <?php if ($canAddSection) { ?>
-            <form class="border-top border-dark">
-                <div class="form-group">
-                    <?php
-                    echo '<label for="add-section-title-' . $course->GetId() . '">Section Title</label>';
-                    echo '<input type="text" class="form-control" id="add-section-title-' . $course->GetId() . '" placeholder="Enter section title">';
-                    ?>
-                </div>
-                <button id="add-section-<?php echo $course->GetId() ?>" class="btn btn-primary addsection" type="button">Add Section</button>
-            </form>
-        <?php } ?>
-        <!-- Alert Box -->
-        <div id ="courseAlert" class="alert alert-danger show invisible" role="alert">
-            <div id="courseAlertBody"></div>
         </div>
-        <!-- Show all courses -->
-    <?php } else { ?>
+    <?php } ?>      
+    <br>
+    <?php if ($canAddSection) { ?>
+        <form class="border-top border-dark">
+            <div class="form-group">
+                <?php
+                echo '<label for="add-section-title-' . $course->GetId() . '">Section Title</label>';
+                echo '<input type="text" class="form-control" id="add-section-title-' . $course->GetId() . '" placeholder="Enter section title">';
+                ?>
+            </div>
+            <button id="add-section-<?php echo $course->GetId() ?>" class="btn btn-primary addsection" type="button">Add Section</button>
+        </form>
     <?php } ?>
-
-    <div class="row mt-2">
-        <div class="col-12 text-left">
-            <a class="btn btn-secondary" href="javascript:history.go(-1)">Back</a>
-        </div>                         
+    <!-- Alert Box -->
+    <div id ="courseAlert" class="alert alert-danger show invisible" role="alert">
+        <div id="courseAlertBody"></div>
     </div>
+    <!-- Show all courses -->
+<?php } else { ?>
+<?php } ?>
 
-    <!-- Add Section Script -->
-    <?php if ($canAddSection) { ?>
-        <script>
-            $(document).ready(function () {
-                $('.addsection').click(function (e) {
-                    action = "add-section";
-                    e.preventDefault();
-                    var courseId = $(this).attr('id').replace('add-section-', '');
-                    var sectionTitle = $('#add-section-title-' + courseId).val();
-                    alert(courseId);
-                    alert(sectionTitle);
-                    $.ajax({
-                        type: "POST",
-                        url: "manage/modify_course.php",
-                        data: {
-                            action: "add-section",
-                            course: courseId,
-                            title: sectionTitle
-                        },
-                        success: function (data) {
-                            data = $.parseJSON(data);
-                            var $success = data.success;
-                            var $message = data.message;
-                            var $alert = $('#courseAlert');
-                            $alert.removeClass("invisible");
-                            if ($success) {
-                                $alert.removeClass("alert-danger");
-                                $alert.addClass("alert-success");
-                                $alert.find("#courseAlertBody").html(function () {
-                                    return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
-                                });
+<div class="row mt-2">
+    <div class="col-12 text-left">
+        <a class="btn btn-secondary" href="javascript:history.go(-1)">Back</a>
+    </div>                         
+</div>
 
-                            } else {
-                                $alert.removeClass("alert-success");
-                                $alert.addClass("alert-danger");
-                                $alert.find("#courseAlertBody").html(function () {
-                                    return "<strong>Error!</strong> " + $message;
-                                });
-                            }
+<!-- Add Section Script -->
+<?php if ($canAddSection) { ?>
+    <script>
+        $(document).ready(function () {
+            $('.addsection').click(function (e) {
+                action = "add-section";
+                e.preventDefault();
+                var courseId = $(this).attr('id').replace('add-section-', '');
+                var sectionTitle = $('#add-section-title-' + courseId).val();
+                $.ajax({
+                    type: "POST",
+                    url: "manage/modify_course.php",
+                    data: {
+                        action: "add-section",
+                        course: courseId,
+                        title: sectionTitle
+                    },
+                    success: function (data) {
+                        data = $.parseJSON(data);
+                        var $success = data.success;
+                        var $message = data.message;
+                        var $alert = $('#courseAlert');
+                        $alert.removeClass("invisible");
+                        if ($success) {
+                            $alert.removeClass("alert-danger");
+                            $alert.addClass("alert-success");
+                            $alert.find("#courseAlertBody").html(function () {
+                                return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
+                            });
+
+                        } else {
+                            $alert.removeClass("alert-success");
+                            $alert.addClass("alert-danger");
+                            $alert.find("#courseAlertBody").html(function () {
+                                return "<strong>Error!</strong> " + $message;
+                            });
                         }
-                    });
-                });
-            });
-        </script>
-    <?php } ?>
-
-    <!-- Add Content Script -->
-    <?php if ($canAddContent) { ?>
-        <script>
-            $(document).ready(function () {
-                $('.addcontent').click(function (e) {
-                    action = "add-content";
-                    e.preventDefault();
-                    var sectionId = $(this).attr('id').replace('add-content-', '');
-                    var contentTitle = $('#add-content-title-' + sectionId).val();
-                    var content = $('#add-content-text-' + sectionId).val();
-                    alert(sectionId);
-                    alert(contentTitle);
-                    alert(content);
-                    $.ajax({
-                        type: "POST",
-                        url: "manage/modify_course.php",
-                        data: {
-                            action: "add-content",
-                            section: sectionId,
-                            title: contentTitle,
-                            content: content
-                        },
-                        success: function (data) {
-                            data = $.parseJSON(data);
-                            var $success = data.success;
-                            var $message = data.message;
-                            var $alert = $('#courseAlert');
-                            $alert.removeClass("invisible");
-                            if ($success) {
-                                $alert.removeClass("alert-danger");
-                                $alert.addClass("alert-success");
-                                $alert.find("#courseAlertBody").html(function () {
-                                    return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
-                                });
-
-                            } else {
-                                $alert.removeClass("alert-success");
-                                $alert.addClass("alert-danger");
-                                $alert.find("#courseAlertBody").html(function () {
-                                    return "<strong>Error!</strong> " + $message;
-                                });
-                            }
-                        }
-                    });
-                });
-            });
-        </script>
-    <?php } ?>
-
-    <!-- Delete Section Script -->
-    <?php if ($canAddSection) { ?>
-        <script>
-            var sectionId;
-            var action;
-            $(document).ready(function () {
-                $('.deletesection').click(function (e) {
-                    action = "delete-section";
-                    e.preventDefault();
-                    sectionId = $(this).attr('id').replace('delete-section-', '');
-                    var $modal = $('#confirmationModal');
-                    $modal.find('.modal-body').html(function () {
-                        return "You are about delete this section."
-                                + "<br><strong>Are you sure?</strong>";
-                    });
-                    $modal.modal({
-                        show: true
-                    });
-                });
-                $('#confirmation-modal-button').click(function (e) {
-                    if (action !== "delete-section") {
-                        return;
                     }
-                    action = null;
-                    e.preventDefault();
-                    $.ajax({
-                        type: "POST",
-                        url: "manage/modify_course.php",
-                        data: {
-                            action: "delete-section",
-                            section: sectionId
-                        },
-                        success: function (data) {
-                            data = $.parseJSON(data);
-                            var $success = data.success;
-                            var $message = data.message;
-                            var $alert = $('#courseAlert');
-                            $alert.removeClass("invisible");
-                            if ($success) {
-                                $alert.removeClass("alert-danger");
-                                $alert.addClass("alert-success");
-                                $alert.find("#courseAlertBody").html(function () {
-                                    return "<strong>Success!</strong> " + $message;
-                                });
-                                $('#sections-' + sectionId).remove();
-
-                            } else {
-                                $alert.removeClass("alert-success");
-                                $alert.addClass("alert-danger");
-                                $alert.find("#courseAlertBody").html(function () {
-                                    return "<strong>Error!</strong> " + $message;
-                                });
-                            }
-                        }
-                    });
                 });
             });
-        </script>
-    <?php } ?>
+        });
+    </script>
+<?php } ?>
 
-    <!-- Delete Content Script -->
-    <?php if ($canAddContent) { ?>
-        <script>
-            var contentId;
-            var action;
-            $(document).ready(function () {
-                $('.deletecontent').click(function (e) {
-                    action = "delete-content";
-                    e.preventDefault();
-                    contentId = $(this).attr('id').replace('delete-content-', '');
-                    var $modal = $('#confirmationModal');
-                    $modal.find('.modal-body').html(function () {
-                        return "You are about delete this section content."
-                                + "<br><strong>Are you sure?</strong>";
-                    });
-                    $modal.modal({
-                        show: true
-                    });
-                });
-                $('#confirmation-modal-button').click(function (e) {
-                    if (action !== "delete-content") {
-                        return;
+<!-- Add Content Script -->
+<?php if ($canAddContent) { ?>
+    <script>
+        $(document).ready(function () {
+            $('.addcontent').click(function (e) {
+                action = "add-content";
+                e.preventDefault();
+                var sectionId = $(this).attr('id').replace('add-content-', '');
+                var contentTitle = $('#add-content-title-' + sectionId).val();
+                var content = $('#add-content-text-' + sectionId).val();
+                $.ajax({
+                    type: "POST",
+                    url: "manage/modify_course.php",
+                    data: {
+                        action: "add-content",
+                        section: sectionId,
+                        title: contentTitle,
+                        content: content
+                    },
+                    success: function (data) {
+                        data = $.parseJSON(data);
+                        var $success = data.success;
+                        var $message = data.message;
+                        var $alert = $('#courseAlert');
+                        $alert.removeClass("invisible");
+                        if ($success) {
+                            $alert.removeClass("alert-danger");
+                            $alert.addClass("alert-success");
+                            $alert.find("#courseAlertBody").html(function () {
+                                return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
+                            });
+
+                        } else {
+                            $alert.removeClass("alert-success");
+                            $alert.addClass("alert-danger");
+                            $alert.find("#courseAlertBody").html(function () {
+                                return "<strong>Error!</strong> " + $message;
+                            });
+                        }
                     }
-                    action = null;
-                    e.preventDefault();
-                    $.ajax({
-                        type: "POST",
-                        url: "manage/modify_course.php",
-                        data: {
-                            action: "delete-content",
-                            content: contentId
-                        },
-                        success: function (data) {
-                            data = $.parseJSON(data);
-                            var $success = data.success;
-                            var $message = data.message;
-                            var $alert = $('#courseAlert');
-                            $alert.removeClass("invisible");
-                            if ($success) {
-                                $alert.removeClass("alert-danger");
-                                $alert.addClass("alert-success");
-                                $alert.find("#courseAlertBody").html(function () {
-                                    return "<strong>Success!</strong> " + $message;
-                                });
-                                $('#contents-' + contentId).remove();
-
-                            } else {
-                                $alert.removeClass("alert-success");
-                                $alert.addClass("alert-danger");
-                                $alert.find("#courseAlertBody").html(function () {
-                                    return "<strong>Error!</strong> " + $message;
-                                });
-                            }
-                        }
-                    });
                 });
             });
-        </script>
-    <?php } ?>
+        });
+    </script>
+<?php } ?>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+<!-- Delete Section Script -->
+<?php if ($canAddSection) { ?>
+    <script>
+        var sectionId;
+        var action;
+        $(document).ready(function () {
+            $('.deletesection').click(function (e) {
+                action = "delete-section";
+                e.preventDefault();
+                sectionId = $(this).attr('id').replace('delete-section-', '');
+                var $modal = $('#confirmationModal');
+                $modal.find('.modal-body').html(function () {
+                    return "You are about delete this section."
+                            + "<br><strong>Are you sure?</strong>";
+                });
+                $modal.modal({
+                    show: true
+                });
+            });
+            $('#confirmation-modal-button').click(function (e) {
+                if (action !== "delete-section") {
+                    return;
+                }
+                action = null;
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: "manage/modify_course.php",
+                    data: {
+                        action: "delete-section",
+                        section: sectionId
+                    },
+                    success: function (data) {
+                        data = $.parseJSON(data);
+                        var $success = data.success;
+                        var $message = data.message;
+                        var $alert = $('#courseAlert');
+                        $alert.removeClass("invisible");
+                        if ($success) {
+                            $alert.removeClass("alert-danger");
+                            $alert.addClass("alert-success");
+                            $alert.find("#courseAlertBody").html(function () {
+                                return "<strong>Success!</strong> " + $message;
+                            });
+                            $('#sections-' + sectionId).remove();
+
+                        } else {
+                            $alert.removeClass("alert-success");
+                            $alert.addClass("alert-danger");
+                            $alert.find("#courseAlertBody").html(function () {
+                                return "<strong>Error!</strong> " + $message;
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+<?php } ?>
+
+<!-- Delete Content Script -->
+<?php if ($canAddContent) { ?>
+    <script>
+        var contentId;
+        var action;
+        $(document).ready(function () {
+            $('.deletecontent').click(function (e) {
+                action = "delete-content";
+                e.preventDefault();
+                contentId = $(this).attr('id').replace('delete-content-', '');
+                var $modal = $('#confirmationModal');
+                $modal.find('.modal-body').html(function () {
+                    return "You are about delete this section content."
+                            + "<br><strong>Are you sure?</strong>";
+                });
+                $modal.modal({
+                    show: true
+                });
+            });
+            $('#confirmation-modal-button').click(function (e) {
+                if (action !== "delete-content") {
+                    return;
+                }
+                action = null;
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: "manage/modify_course.php",
+                    data: {
+                        action: "delete-content",
+                        content: contentId
+                    },
+                    success: function (data) {
+                        data = $.parseJSON(data);
+                        var $success = data.success;
+                        var $message = data.message;
+                        var $alert = $('#courseAlert');
+                        $alert.removeClass("invisible");
+                        if ($success) {
+                            $alert.removeClass("alert-danger");
+                            $alert.addClass("alert-success");
+                            $alert.find("#courseAlertBody").html(function () {
+                                return "<strong>Success!</strong> " + $message;
+                            });
+                            $('#contents-' + contentId).remove();
+
+                        } else {
+                            $alert.removeClass("alert-success");
+                            $alert.addClass("alert-danger");
+                            $alert.find("#courseAlertBody").html(function () {
+                                return "<strong>Error!</strong> " + $message;
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+<?php } ?>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 </body>
 </html>
