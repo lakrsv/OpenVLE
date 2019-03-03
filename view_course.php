@@ -54,7 +54,7 @@ if (!$courseId) {
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
 
-        <title>OpenVLE - Admin</title>
+        <title>OpenVLE - Courses</title>
     </head>
     <body>
 
@@ -82,7 +82,7 @@ if (!$courseId) {
                             <a class="nav-link" href="manage_roles.php">Manage Roles</a>
                         </li>
                     </ul>
-                    <a id="inbox" class="btn btn-default">
+                    <a id="inbox" class="btn btn-default" href="view_mailbox.php">
                         <span class="fa-stack">
                             <i class="fas fa-envelope fa-stack-2x text-white"></i>
                             <i class="fa-stack-1x text-info text-right pr-1 pt-3">
@@ -113,7 +113,7 @@ if (!$courseId) {
                             <a class="nav-link" href="view_profile.php">Your Profile</a>
                         </li>
                     </ul>
-                    <a id="inbox" class="btn btn-default">
+                    <a id="inbox" class="btn btn-default" href="view_mailbox.php">
                         <span class="fa-stack">
                             <i class="fas fa-envelope fa-stack-2x text-white"></i>
                             <i class="fa-stack-1x text-info text-right pr-1 pt-3">
@@ -188,7 +188,7 @@ if (!$courseId) {
                                 </h5>
                             </div>
 
-                            <div id="collapseOne" class="collapse show" aria-labelledby="heading-tutors" data-parent="#accordion">
+                            <div id="collapseOne" class="collapse" aria-labelledby="heading-tutors" data-parent="#accordion">
                                 <div class="card-body">
                                     <div id="userTable" class="table">
                                         <table class="table table-striped table-bordered">
@@ -227,7 +227,7 @@ if (!$courseId) {
                                                     echo '<div class="row">';
                                                     if ($userRole->HasPermission("view_profiles")) {
                                                         echo '<a class="fas fa-user fa-2x mr-1 text-dark no-decoration" href="view_profile.php?id=' . $user . '" data-toggle="tooltip" data-placement="bottom" title="Visit Profile"></a>';
-                                                        echo '<a class="far fa-envelope ml-1 fa-2x text-dark no-decoration" href="view_profile.php?id=' . $user . '" data-toggle="tooltip" data-placement="bottom" title="Send Message"></a>';
+                                                        echo '<a class="far fa-envelope ml-1 fa-2x text-dark no-decoration" href="view_mailbox.php?to=' . $user . '" data-toggle="tooltip" data-placement="bottom" title="Send Message"></a>';
                                                     }
                                                     echo '</div>';
                                                     echo '</div>';

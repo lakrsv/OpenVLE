@@ -56,7 +56,7 @@ if (!$userRole->HasPermission("manage_users")) {
                         <a class="nav-link" href="manage_roles.php">Manage Roles</a>
                     </li>
                 </ul>
-                <a id="inbox" class="btn btn-default">
+                <a id="inbox" class="btn btn-default" href="view_mailbox.php">
                     <span class="fa-stack">
                         <i class="fas fa-envelope fa-stack-2x text-white"></i>
                         <i class="fa-stack-1x text-info text-right pr-1 pt-3">
