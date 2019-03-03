@@ -65,4 +65,12 @@ class CourseSection {
         $statement->execute();
     }
 
+    public static function AddSectionToCourse($courseId, $sectionTitle) {
+        $connection = MysqlConfig::Connect();
+        $sql = "INSERT INTO CourseSections (courseId, name) VALUES (:courseid, :name)";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("courseid", $courseId, PDO::PARAM_STR);
+        $statement->bindValue("name", $sectionTitle, PDO::PARAM_STR);
+        $statement->execute();
+    }
 }

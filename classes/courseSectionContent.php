@@ -12,35 +12,35 @@
  * @author lakrs
  */
 class CourseSectionContent {
-    
+
     const Text = 1;
     const PDF = 2;
     const Quiz = 3;
-    
+
     private $id;
     private $sectionId;
     private $name;
     private $type;
     private $data;
-    
-    public function GetId(){
+
+    public function GetId() {
         return $this->id;
     }
-    
-    public function GetSectionId(){
+
+    public function GetSectionId() {
         return $this->sectionId;
     }
-    
-    public function GetName(){
+
+    public function GetName() {
         return $this->name;
     }
-    
-    public function GetType(){
+
+    public function GetType() {
         return $this->type;
     }
-    
-    public function GetData(){
-        switch ($this->type){
+
+    public function GetData() {
+        switch ($this->type) {
             case CourseSectionContent::Text:
                 return $this->data;
             case CourseSectionContent::PDF;
@@ -50,7 +50,7 @@ class CourseSectionContent {
         }
         return $this->data;
     }
-    
+
     public function __construct($id, $sectionId, $name, $type, $data) {
         $this->id = $id;
         $this->sectionId = $sectionId;
@@ -58,7 +58,7 @@ class CourseSectionContent {
         $this->type = $type;
         $this->data = $data;
     }
-    
+
     public static function ContentWithIdExists($contentId) {
         $connection = MysqlConfig::Connect();
         $sql = "SELECT id FROM CourseSectionContent WHERE id = :contentid LIMIT 1";
@@ -76,4 +76,16 @@ class CourseSectionContent {
         $statement->bindValue("contentid", $contentId, PDO::PARAM_STR);
         $statement->execute();
     }
+
+    public static function AddContentToSection($sectionId, $contentTitle, $content) {
+        $connection = MysqlConfig::Connect();
+        // 1 as only one type is currently supported.
+        $sql = "INSERT INTO CourseSectionContent (sectionId, name, type, data) VALUES (:sectionid, :name, 1, :data)";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("sectionid", $sectionId, PDO::PARAM_STR);
+        $statement->bindValue("name", $contentTitle, PDO::PARAM_STR);
+        $statement->bindValue("data", $content, PDO::PARAM_STR);
+        $statement->execute();
+    }
+
 }

@@ -234,9 +234,21 @@ if (!$courseId) {
                         <?php } ?>
                         <?php if ($canAddContent) { ?>
                             <br>
-                            <div>
-                                <button id="add-content-<?php echo $section->GetId() ?>" class="btn btn-primary" type="button">Add Section Content</button>
-                            </div>
+                            <form class="border-top border-dark">
+                                <div class="form-group">
+                                    <?php
+                                    echo '<label for="add-content-title-' . $section->GetId() . '">Content Title</label>';
+                                    echo '<input type="text" class="form-control" id="add-content-title-' . $section->GetId() . '" placeholder="Enter content title">';
+                                    ?>
+                                </div>
+                                <div class="form-group">
+                                    <?php
+                                    echo '<label for="add-content-text-' . $section->GetId() . '">Content</label>';
+                                    echo '<textarea class="form-control" id="add-content-text-' . $section->GetId() . '" rows="3"></textarea>';
+                                    ?>
+                                </div>
+                                <button id="add-content-<?php echo $section->GetId() ?>" class="btn btn-primary addcontent" type="button">Add Section Content</button>
+                            </form>
                         <?php } ?>
                     </div>
                 </div>
@@ -244,9 +256,15 @@ if (!$courseId) {
         <?php } ?>      
         <br>
         <?php if ($canAddSection) { ?>
-            <div>
-                <button id="add-section-<?php echo $course->GetId() ?>" class="btn btn-primary" type="button">Add Section</button>
-            </div>
+            <form class="border-top border-dark">
+                <div class="form-group">
+                    <?php
+                    echo '<label for="add-section-title-' . $course->GetId() . '">Section Title</label>';
+                    echo '<input type="text" class="form-control" id="add-section-title-' . $course->GetId() . '" placeholder="Enter section title">';
+                    ?>
+                </div>
+                <button id="add-section-<?php echo $course->GetId() ?>" class="btn btn-primary addsection" type="button">Add Section</button>
+            </form>
         <?php } ?>
         <!-- Alert Box -->
         <div id ="courseAlert" class="alert alert-danger show invisible" role="alert">
@@ -265,12 +283,95 @@ if (!$courseId) {
     <!-- Add Section Script -->
     <?php if ($canAddSection) { ?>
         <script>
+            $(document).ready(function () {
+                $('.addsection').click(function (e) {
+                    action = "add-section";
+                    e.preventDefault();
+                    var courseId = $(this).attr('id').replace('add-section-', '');
+                    var sectionTitle = $('#add-section-title-' + courseId).val();
+                    alert(courseId);
+                    alert(sectionTitle);
+                    $.ajax({
+                        type: "POST",
+                        url: "manage/modify_course.php",
+                        data: {
+                            action: "add-section",
+                            course: courseId,
+                            title: sectionTitle
+                        },
+                        success: function (data) {
+                            data = $.parseJSON(data);
+                            var $success = data.success;
+                            var $message = data.message;
+                            var $alert = $('#courseAlert');
+                            $alert.removeClass("invisible");
+                            if ($success) {
+                                $alert.removeClass("alert-danger");
+                                $alert.addClass("alert-success");
+                                $alert.find("#courseAlertBody").html(function () {
+                                    return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
+                                });
+
+                            } else {
+                                $alert.removeClass("alert-success");
+                                $alert.addClass("alert-danger");
+                                $alert.find("#courseAlertBody").html(function () {
+                                    return "<strong>Error!</strong> " + $message;
+                                });
+                            }
+                        }
+                    });
+                });
+            });
         </script>
     <?php } ?>
 
     <!-- Add Content Script -->
     <?php if ($canAddContent) { ?>
         <script>
+            $(document).ready(function () {
+                $('.addcontent').click(function (e) {
+                    action = "add-content";
+                    e.preventDefault();
+                    var sectionId = $(this).attr('id').replace('add-content-', '');
+                    var contentTitle = $('#add-content-title-' + sectionId).val();
+                    var content = $('#add-content-text-' + sectionId).val();
+                    alert(sectionId);
+                    alert(contentTitle);
+                    alert(content);
+                    $.ajax({
+                        type: "POST",
+                        url: "manage/modify_course.php",
+                        data: {
+                            action: "add-content",
+                            section: sectionId,
+                            title: contentTitle,
+                            content: content
+                        },
+                        success: function (data) {
+                            data = $.parseJSON(data);
+                            var $success = data.success;
+                            var $message = data.message;
+                            var $alert = $('#courseAlert');
+                            $alert.removeClass("invisible");
+                            if ($success) {
+                                $alert.removeClass("alert-danger");
+                                $alert.addClass("alert-success");
+                                $alert.find("#courseAlertBody").html(function () {
+                                    return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
+                                });
+
+                            } else {
+                                $alert.removeClass("alert-success");
+                                $alert.addClass("alert-danger");
+                                $alert.find("#courseAlertBody").html(function () {
+                                    return "<strong>Error!</strong> " + $message;
+                                });
+                            }
+                        }
+                    });
+                });
+            });
         </script>
     <?php } ?>
 
@@ -310,7 +411,6 @@ if (!$courseId) {
                             data = $.parseJSON(data);
                             var $success = data.success;
                             var $message = data.message;
-
                             var $alert = $('#courseAlert');
                             $alert.removeClass("invisible");
                             if ($success) {
@@ -371,7 +471,6 @@ if (!$courseId) {
                             data = $.parseJSON(data);
                             var $success = data.success;
                             var $message = data.message;
-
                             var $alert = $('#courseAlert');
                             $alert.removeClass("invisible");
                             if ($success) {
