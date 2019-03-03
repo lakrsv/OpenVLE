@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../auth/mysql_config.php';
+require_once __DIR__ . '/../auth/role.php';
 require_once 'courseSection.php';
 
 class Course {
@@ -26,9 +27,9 @@ class Course {
     public function GetDescription() {
         return $this->description;
     }
-    
-    public function GetSections(){
-         $connection = MysqlConfig::Connect();
+
+    public function GetSections() {
+        $connection = MysqlConfig::Connect();
         $sql = "SELECT * FROM CourseSections WHERE courseId = :id";
         $statement = $connection->prepare($sql);
         $statement->bindValue("id", $this->id);
@@ -44,6 +45,22 @@ class Course {
             array_push($sections, $section);
         }
         return $sections;
+    }
+
+    public function GetUsers() {
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT userId FROM CourseUsers WHERE courseId = :id";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("id", $this->id);
+        $statement->execute();
+
+        $users = array();
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $userId = $row['userId'];
+
+            array_push($users, $userId);
+        }
+        return $users;
     }
 
     public static function GetAll() {
@@ -73,7 +90,7 @@ class Course {
 
         return count($statement->fetchAll()) > 0 ? TRUE : FALSE;
     }
-    
+
     public static function CourseWithIdExists($courseId) {
         $connection = MysqlConfig::Connect();
         $sql = "SELECT id FROM Courses WHERE id = :courseid LIMIT 1";
@@ -83,8 +100,8 @@ class Course {
 
         return count($statement->fetchAll()) > 0 ? TRUE : FALSE;
     }
-    
-     public static function DeleteCourseWithId($courseId) {
+
+    public static function DeleteCourseWithId($courseId) {
         $connection = MysqlConfig::Connect();
         $sql = "DELETE FROM Courses WHERE id = :courseid;";
         $statement = $connection->prepare($sql);
@@ -116,8 +133,8 @@ class Course {
 
         return $course;
     }
-    
-      public static function GetCourseWithId($id) {
+
+    public static function GetCourseWithId($id) {
         $connection = MysqlConfig::Connect();
         $sql = "SELECT * FROM Courses WHERE id = :id LIMIT 1;";
         $statement = $connection->prepare($sql);
@@ -132,14 +149,14 @@ class Course {
 
         return $course;
     }
-    
-    public static function GetCoursesForUser($userId){
+
+    public static function GetCoursesForUser($userId) {
         $connection = MysqlConfig::Connect();
         $sql = "SELECT c.* FROM CourseUsers cu INNER JOIN Courses c ON cu.courseId = c.id WHERE cu.userId = :userid";
         $statement = $connection->prepare($sql);
         $statement->bindValue("userid", $userId, PDO::PARAM_STR);
         $statement->execute();
-        
+
         $coursesForUser = array();
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             array_push($coursesForUser, new Course($row['id'], $row['name'], $row['description']));
@@ -147,4 +164,15 @@ class Course {
 
         return $coursesForUser;
     }
+
+    public static function IsPrivilegedCourseUser($courseId, $userId) {
+        $userRole = Role::GetRoleFromUserId($userId);
+        $canManageCourses = $userRole->HasPermission("manage_courses");
+        $canAddAssignment = $userRole->HasPermission("add_assignment");
+        $canAddQuiz = $userRole->HasPermission("add_quiz");
+        $canAddResource = $userRole->HasPermission("add_resource");
+
+        return $canManageCourses || $canAddAssignment || $canAddQuiz || $canAddResource;
+    }
+
 }

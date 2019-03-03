@@ -109,9 +109,6 @@ $userEmail = User::GetEmailFromId($userId);
                 <div class="collapse navbar-collapse" id="collapse">
                     <ul class="navbar-nav mr-auto px-2">
                         <li class="nav-item">
-                            <a class="nav-link" href="user_home.php">Your Dashboard</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="view_course.php">Your Courses</a>
                         </li>
                         <li class="nav-item active">
@@ -188,7 +185,7 @@ $userEmail = User::GetEmailFromId($userId);
                                         <label class="custom-file-label" for="picture-upload" aria-describedby="picture-upload-button" id="profile-label">Choose profile picture</label>
                                     </div>
                                 </div>
-                                <small class="form-text text-muted mb-3">(PNG, JPG) Max: 2 MB</small>
+                                <small class="form-text text-muted mb-3">(PNG, JPG) Max: 2 MB, 200x200 pixels</small>
                             <?php } ?>
 
                             <?php

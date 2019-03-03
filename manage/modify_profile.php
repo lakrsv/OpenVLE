@@ -85,9 +85,16 @@ function TryChangePicture($userId) {
         return $response;
     }
 
+    list($width, $height, $type, $attr) = getimagesize($file["tmp_name"]);
+    if ($width != 200 && $height != 200) {
+        $response['success'] = FALSE;
+        $response['message'] = "The image must be 200x200 pixels";
+        return $response;
+    }
+
     $fileData = file_get_contents($file["tmp_name"]);
     User::ChangeUserProfilePicture($userId, $fileData);
-    
+
     $response['success'] = TRUE;
     $response['message'] = "Image successfully uploaded!";
     return $response;

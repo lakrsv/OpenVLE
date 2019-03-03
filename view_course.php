@@ -106,9 +106,6 @@ if (!$courseId) {
                 </button>
                 <div class="collapse navbar-collapse" id="collapse">
                     <ul class="navbar-nav mr-auto px-2">
-                        <li class="nav-item">
-                            <a class="nav-link" href="user_home.php">Your Dashboard</a>
-                        </li>
                         <li class="nav-item active">
                             <a class="nav-link" href="view_course.php">Your Courses</a>
                         </li>
@@ -169,370 +166,441 @@ if (!$courseId) {
             </div>
             <div class="container-fluid mt-2">
                 <div class="col-12">
-                    <?php foreach ($courseSections as $section) { ?>
-                        <div id="sections-<?php echo $section->GetId() ?>">
-                            <div class="card">
-                                <?php echo '<div class="card-header bg-dark row mx-0" id="section-header-' . $section->GetId() . '">' ?>
-                                <div class="col-10">
-
-                                    <h5 class="mb-0">
-                                        <?php echo '<button class="btn btn-link text-white" data-toggle="collapse" data-target="#section-collapse-' . $section->GetId() . '" aria-expanded="true" aria-controls="section-collapse-' . $section->GetId() . '">' ?>
-                                        <?php echo $section->GetName(); ?>
-                                        </button>
-                                    </h5>
-                                </div>
-
-                                <?php
-                                if ($canAddSection) {
-                                    echo '<div class="col-2 text-right">';
-                                    echo '<a class="far fa-times-circle text-danger no-decoration deletesection" id="delete-section-' . $section->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Delete section"></a>';
-                                    echo '</div>';
-                                }
-                                ?>
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header bg-info row mx-0" id="heading-tutors">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link text-white" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        Course Tutors
+                                    </button>
+                                </h5>
                             </div>
 
-                            <?php
-                            $sectionContents = $section->GetContents();
-                            ?>
+                            <div id="collapseOne" class="collapse show" aria-labelledby="heading-tutors" data-parent="#accordion">
+                                <div class="card-body">
+                                    <?php
+                                    $courseUserIds = $course->GetUsers();
+                                    $showPrivilegedOnly = TRUE;
+                                    // Show all course users
+                                    if ($canManageCourses || $canAddSection || $canAddContent) {
+                                        $showPrivilegedOnly = FALSE;
+                                    }
+                                    // Show privileged course users only
+                                    else {
+                                        $showPrivilegedOnly = TRUE;
+                                    }
+                                    ?>
 
-                            <?php echo '<div id="section-collapse-' . $section->GetId() . '" class="collapse show bg-light" aria-labelledby="section-header-' . $section->GetId() . '" data-parent="#sections-' . $section->GetId() . '">' ?>
-                            <div class="card-body">
-                                <?php foreach ($sectionContents as $content) { ?>
-                                    <div id="contents-<?php echo $content->GetId() ?>">
-                                        <div class="card">
-                                            <?php echo '<div class="card-header bg-light row mx-0" id="content-header-' . $content->GetId() . '">' ?>
-                                            <div class="col-10">
-                                                <h5 class="mb-0">
+                                    <div id="courseTable" class="table-responsive">
+                                        <table class="table table-striped table-bordered">
+                                            <tbody>
+                                                <?php
+                                                foreach ($courseUserIds as $user) {
+                                                    if ($showPrivilegedOnly && !Course::IsPrivilegedCourseUser($course->GetId(), $user)) {
+                                                        continue;
+                                                    }
 
-                                                    <?php echo '<button class="btn btn-link text-dark" data-toggle="collapse" data-target="#content-collapse-' . $content->GetId() . '" aria-expanded="true" aria-controls="content-collapse-' . $content->GetId() . '">' ?>
-                                                    <?php echo $content->GetName(); ?>
-                                                    </button>
-                                                </h5>
-                                            </div>
-                                            <?php
-                                            if ($canAddContent) {
-                                                echo '<div class="col-2 text-right">';
-                                                echo '<a class="far fa-times-circle text-danger no-decoration deletecontent" id="delete-content-' . $content->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Delete content"></a>';
+                                                    $userRoleName = Role::GetRoleFromUserId($user)->GetName();
+                                                    echo '<tr id=courseuser-' . $user . '>';
+                                                    echo '<th scope="row">';
+                                                    echo '<div>';
+                                                    echo '<div class="row">';
+                                                    // User Profile Picture
+                                                    echo '<div class="col text-left">';
+                                                    $imageData = User::GetUserProfilePicture($user);
+                                                    if ($imageData) {
+                                                        echo '<img src="data:image/jpg;base64,' . base64_encode($imageData) . '" class="img-thumbnail" alt="Profile Picture"/>';
+                                                    } 
+                                                    echo '</div>';
+                                                    // User Name
+                                                    echo '<div class="col text-left">';
+                                                    echo User::GetUsernameFromId($user);
+                                                    echo '</div>';
+                                                // User Role
+                                                echo '<div class="col text-left">';
+                                                    echo ' <strong>[' . ucwords($userRoleName) . ']</strong>';
+                                                    echo '</div>';
                                                 echo '</div>';
-                                            }
-                                            ?>
-                                        </div>
-
-                                        <?php echo '<div id="content-collapse-' . $content->GetId() . '" class="collapse show" aria-labelledby="content-header-' . $content->GetId() . '" data-parent="#contents-' . $content->GetId() . '">' ?>
-                                        <div class="card-body">
-                                            <?php if ($content->GetType() == CourseSectionContent::Text) { ?>
-                                                <?php echo $content->GetData() ?>
-                                            <?php } else if ($content->GetType() == CourseSectionContent::PDF) { ?>
-                                                <!-- Not Implemented -->
-                                            <?php } else if ($content->GetType() == CourseSectionContent::Quiz) { ?>
-                                                <!-- Not Implemented -->
-                                            <?php } ?>
-                                        </div>
-                                    </div>
+                                        echo '</div>';
+                                    echo '</th>';
+                                    echo '</tr>';
+                                    }
+                                    ?>
+                                    </tbody>
+                                    </table>
                                 </div>
                             </div>
-                        <?php } ?>
-                        <?php if ($canAddContent) { ?>
-                            <br>
-                            <form class="border-top border-dark">
-                                <div class="form-group">
-                                    <?php
-                                    echo '<label for="add-content-title-' . $section->GetId() . '">Content Title</label>';
-                                    echo '<input type="text" class="form-control" id="add-content-title-' . $section->GetId() . '" placeholder="Enter content title">';
-                                    ?>
-                                </div>
-                                <div class="form-group">
-                                    <?php
-                                    echo '<label for="add-content-text-' . $section->GetId() . '">Content</label>';
-                                    echo '<textarea class="form-control" id="add-content-text-' . $section->GetId() . '" rows="3"></textarea>';
-                                    ?>
-                                </div>
-                                <button id="add-content-<?php echo $section->GetId() ?>" class="btn btn-primary addcontent" type="button">Add Section Content</button>
-                            </form>
-                        <?php } ?>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    <?php } ?>      
-    <br>
-    <?php if ($canAddSection) { ?>
-        <form class="border-top border-dark">
-            <div class="form-group">
-                <?php
-                echo '<label for="add-section-title-' . $course->GetId() . '">Section Title</label>';
-                echo '<input type="text" class="form-control" id="add-section-title-' . $course->GetId() . '" placeholder="Enter section title">';
-                ?>
+        <div class="container-fluid mt-2">
+            <div class="col-12">
+                <?php foreach ($courseSections as $section) { ?>
+                    <div id="sections-<?php echo $section->GetId() ?>">
+                        <div class="card">
+                            <?php echo '<div class="card-header bg-dark row mx-0" id="section-header-' . $section->GetId() . '">' ?>
+                            <div class="col-10">
+
+                                <h5 class="mb-0">
+                                    <?php echo '<button class="btn btn-link text-white" data-toggle="collapse" data-target="#section-collapse-' . $section->GetId() . '" aria-expanded="true" aria-controls="section-collapse-' . $section->GetId() . '">' ?>
+                                    <?php echo $section->GetName(); ?>
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <?php
+                            if ($canAddSection) {
+                                echo '<div class="col-2 text-right">';
+                                echo '<a class="far fa-times-circle text-danger no-decoration deletesection" id="delete-section-' . $section->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Delete section"></a>';
+                                echo '</div>';
+                            }
+                            ?>
+                        </div>
+
+                        <?php
+                        $sectionContents = $section->GetContents();
+                        ?>
+
+                        <?php echo '<div id="section-collapse-' . $section->GetId() . '" class="collapse show bg-light" aria-labelledby="section-header-' . $section->GetId() . '" data-parent="#sections-' . $section->GetId() . '">' ?>
+                        <div class="card-body">
+                            <?php foreach ($sectionContents as $content) { ?>
+                                <div id="contents-<?php echo $content->GetId() ?>">
+                                    <div class="card">
+                                        <?php echo '<div class="card-header bg-light row mx-0" id="content-header-' . $content->GetId() . '">' ?>
+                                        <div class="col-10">
+                                            <h5 class="mb-0">
+
+                                                <?php echo '<button class="btn btn-link text-dark" data-toggle="collapse" data-target="#content-collapse-' . $content->GetId() . '" aria-expanded="true" aria-controls="content-collapse-' . $content->GetId() . '">' ?>
+                                                <?php echo $content->GetName(); ?>
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <?php
+                                        if ($canAddContent) {
+                                            echo '<div class="col-2 text-right">';
+                                            echo '<a class="far fa-times-circle text-danger no-decoration deletecontent" id="delete-content-' . $content->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Delete content"></a>';
+                                            echo '</div>';
+                                        }
+                                        ?>
+                                    </div>
+
+                                    <?php echo '<div id="content-collapse-' . $content->GetId() . '" class="collapse show" aria-labelledby="content-header-' . $content->GetId() . '" data-parent="#contents-' . $content->GetId() . '">' ?>
+                                    <div class="card-body">
+                                        <?php if ($content->GetType() == CourseSectionContent::Text) { ?>
+                                            <?php echo $content->GetData() ?>
+                                        <?php } else if ($content->GetType() == CourseSectionContent::PDF) { ?>
+                                            <!-- Not Implemented -->
+                                        <?php } else if ($content->GetType() == CourseSectionContent::Quiz) { ?>
+                                            <!-- Not Implemented -->
+                                        <?php } ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
+                    <?php if ($canAddContent) { ?>
+                        <br>
+                        <form class="border-top border-dark">
+                            <div class="form-group">
+                                <?php
+                                echo '<label for="add-content-title-' . $section->GetId() . '">Content Title</label>';
+                                echo '<input type="text" class="form-control" id="add-content-title-' . $section->GetId() . '" placeholder="Enter content title">';
+                                ?>
+                            </div>
+                            <div class="form-group">
+                                <?php
+                                echo '<label for="add-content-text-' . $section->GetId() . '">Content</label>';
+                                echo '<textarea class="form-control" id="add-content-text-' . $section->GetId() . '" rows="3"></textarea>';
+                                ?>
+                            </div>
+                            <button id="add-content-<?php echo $section->GetId() ?>" class="btn btn-primary addcontent" type="button">Add Section Content</button>
+                        </form>
+                    <?php } ?>
+                </div>
             </div>
-            <button id="add-section-<?php echo $course->GetId() ?>" class="btn btn-primary addsection" type="button">Add Section</button>
-        </form>
-    <?php } ?>
-    <!-- Alert Box -->
-    <div id ="courseAlert" class="alert alert-danger show invisible" role="alert">
-        <div id="courseAlertBody"></div>
-    </div>
-    <!-- Show all courses -->
-<?php } else { ?>
-    <!-- If We are Admin, show all courses -->
-    <?php
-    if ($canManageCourses) {
-        $userCourses = Course::GetAll();
-    }
-    ?>
-    <div class="container-fluid mt-2">
-        <div id="courseTable" class="table-responsive">
-            <table class="table table-striped table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Course</th>
-                        <th scope="col">Description</th>
-                    </tr>
-                </thead>
-                <tbody>
+            </div>
+            </div>
+        <?php } ?>      
+        <br>
+        <?php if ($canAddSection) { ?>
+            <form class="border-top border-dark">
+                <div class="form-group">
                     <?php
-                    foreach ($userCourses as $course) {
-                        echo '<tr id=course-' . $course->GetId() . '>';
-                        echo '<th scope="row">';
-                        echo '<div class="container">';
-                        echo '<div class="row">';
-                        echo '<div class="col-10 coursename">';
-                        echo $course->GetName();
-                        echo '</div>';
-                        echo '<div class="col-2 text-right">';
-                        echo '<a class="fas fa-sign-in-alt text-dark no-decoration editcourse" href="view_course.php?id=' . $course->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Enter course"></a>';
-                        echo '</div>';
-                        echo '</div>';
-                        echo '</div>';
-                        echo '</th>';
-                        echo '<td id="coursedescription">';
-                        echo $course->GetDescription();
-                        echo '</td>';
-                        echo '</tr>';
-                    }
+                    echo '<label for="add-section-title-' . $course->GetId() . '">Section Title</label>';
+                    echo '<input type="text" class="form-control" id="add-section-title-' . $course->GetId() . '" placeholder="Enter section title">';
                     ?>
-                </tbody>
-            </table>
+                </div>
+                <button id="add-section-<?php echo $course->GetId() ?>" class="btn btn-primary addsection" type="button">Add Section</button>
+            </form>
+        <?php } ?>
+        <!-- Alert Box -->
+        <div id ="courseAlert" class="alert alert-danger show invisible" role="alert">
+            <div id="courseAlertBody"></div>
         </div>
-    </div>
-<?php } ?>
-
-<?php if ($courseId) { ?>
-    <div class="row mt-2">
-        <div class="col-12 text-left">
-            <a class="btn btn-secondary" href="javascript:history.go(-1)">Back</a>
-        </div>                         
-    </div>
-<?php } ?>
-
-<!-- Add Section Script -->
-<?php if ($canAddSection) { ?>
-    <script>
-        $(document).ready(function () {
-            $('.addsection').click(function (e) {
-                action = "add-section";
-                e.preventDefault();
-                var courseId = $(this).attr('id').replace('add-section-', '');
-                var sectionTitle = $('#add-section-title-' + courseId).val();
-                $.ajax({
-                    type: "POST",
-                    url: "manage/modify_course.php",
-                    data: {
-                        action: "add-section",
-                        course: courseId,
-                        title: sectionTitle
-                    },
-                    success: function (data) {
-                        data = $.parseJSON(data);
-                        var $success = data.success;
-                        var $message = data.message;
-                        var $alert = $('#courseAlert');
-                        $alert.removeClass("invisible");
-                        if ($success) {
-                            $alert.removeClass("alert-danger");
-                            $alert.addClass("alert-success");
-                            $alert.find("#courseAlertBody").html(function () {
-                                return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
-                            });
-
-                        } else {
-                            $alert.removeClass("alert-success");
-                            $alert.addClass("alert-danger");
-                            $alert.find("#courseAlertBody").html(function () {
-                                return "<strong>Error!</strong> " + $message;
-                            });
+        <!-- Show all courses -->
+    <?php } else { ?>
+        <!-- If We are Admin, show all courses -->
+        <?php
+        if ($canManageCourses) {
+            $userCourses = Course::GetAll();
+        }
+        ?>
+        <div class="container-fluid mt-2">
+            <div id="courseTable" class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Course</th>
+                            <th scope="col">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach ($userCourses as $course) {
+                            echo '<tr id=course-' . $course->GetId() . '>';
+                            echo '<th scope="row">';
+                            echo '<div class="container">';
+                            echo '<div class="row">';
+                            echo '<div class="col-10 coursename">';
+                            echo $course->GetName();
+                            echo '</div>';
+                            echo '<div class="col-2 text-right">';
+                            echo '<a class="fas fa-sign-in-alt text-dark no-decoration editcourse" href="view_course.php?id=' . $course->GetId() . '" data-toggle="tooltip" data-placement="bottom" title="Enter course"></a>';
+                            echo '</div>';
+                            echo '</div>';
+                            echo '</div>';
+                            echo '</th>';
+                            echo '<td id="coursedescription">';
+                            echo $course->GetDescription();
+                            echo '</td>';
+                            echo '</tr>';
                         }
-                    }
-                });
-            });
-        });
-    </script>
-<?php } ?>
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <?php } ?>
 
-<!-- Add Content Script -->
-<?php if ($canAddContent) { ?>
-    <script>
-        $(document).ready(function () {
-            $('.addcontent').click(function (e) {
-                action = "add-content";
-                e.preventDefault();
-                var sectionId = $(this).attr('id').replace('add-content-', '');
-                var contentTitle = $('#add-content-title-' + sectionId).val();
-                var content = $('#add-content-text-' + sectionId).val();
-                $.ajax({
-                    type: "POST",
-                    url: "manage/modify_course.php",
-                    data: {
-                        action: "add-content",
-                        section: sectionId,
-                        title: contentTitle,
-                        content: content
-                    },
-                    success: function (data) {
-                        data = $.parseJSON(data);
-                        var $success = data.success;
-                        var $message = data.message;
-                        var $alert = $('#courseAlert');
-                        $alert.removeClass("invisible");
-                        if ($success) {
-                            $alert.removeClass("alert-danger");
-                            $alert.addClass("alert-success");
-                            $alert.find("#courseAlertBody").html(function () {
-                                return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
-                            });
+    <?php if ($courseId) { ?>
+        <div class="row mt-2">
+            <div class="col-12 text-left">
+                <a class="btn btn-secondary" href="javascript:history.go(-1)">Back</a>
+            </div>                         
+        </div>
+    <?php } ?>
 
-                        } else {
-                            $alert.removeClass("alert-success");
-                            $alert.addClass("alert-danger");
-                            $alert.find("#courseAlertBody").html(function () {
-                                return "<strong>Error!</strong> " + $message;
-                            });
+    <!-- Add Section Script -->
+    <?php if ($canAddSection) { ?>
+        <script>
+            $(document).ready(function () {
+                $('.addsection').click(function (e) {
+                    action = "add-section";
+                    e.preventDefault();
+                    var courseId = $(this).attr('id').replace('add-section-', '');
+                    var sectionTitle = $('#add-section-title-' + courseId).val();
+                    $.ajax({
+                        type: "POST",
+                        url: "manage/modify_course.php",
+                        data: {
+                            action: "add-section",
+                            course: courseId,
+                            title: sectionTitle
+                        },
+                        success: function (data) {
+                            data = $.parseJSON(data);
+                            var $success = data.success;
+                            var $message = data.message;
+                            var $alert = $('#courseAlert');
+                            $alert.removeClass("invisible");
+                            if ($success) {
+                                $alert.removeClass("alert-danger");
+                                $alert.addClass("alert-success");
+                                $alert.find("#courseAlertBody").html(function () {
+                                    return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
+                                });
+
+                            } else {
+                                $alert.removeClass("alert-success");
+                                $alert.addClass("alert-danger");
+                                $alert.find("#courseAlertBody").html(function () {
+                                    return "<strong>Error!</strong> " + $message;
+                                });
+                            }
                         }
-                    }
+                    });
                 });
             });
-        });
-    </script>
-<?php } ?>
+        </script>
+    <?php } ?>
 
-<!-- Delete Section Script -->
-<?php if ($canAddSection) { ?>
-    <script>
-        var sectionId;
-        var action;
-        $(document).ready(function () {
-            $('.deletesection').click(function (e) {
-                action = "delete-section";
-                e.preventDefault();
-                sectionId = $(this).attr('id').replace('delete-section-', '');
-                var $modal = $('#confirmationModal');
-                $modal.find('.modal-body').html(function () {
-                    return "You are about delete this section."
-                            + "<br><strong>Are you sure?</strong>";
-                });
-                $modal.modal({
-                    show: true
-                });
-            });
-            $('#confirmation-modal-button').click(function (e) {
-                if (action !== "delete-section") {
-                    return;
-                }
-                action = null;
-                e.preventDefault();
-                $.ajax({
-                    type: "POST",
-                    url: "manage/modify_course.php",
-                    data: {
-                        action: "delete-section",
-                        section: sectionId
-                    },
-                    success: function (data) {
-                        data = $.parseJSON(data);
-                        var $success = data.success;
-                        var $message = data.message;
-                        var $alert = $('#courseAlert');
-                        $alert.removeClass("invisible");
-                        if ($success) {
-                            $alert.removeClass("alert-danger");
-                            $alert.addClass("alert-success");
-                            $alert.find("#courseAlertBody").html(function () {
-                                return "<strong>Success!</strong> " + $message;
-                            });
-                            $('#sections-' + sectionId).remove();
+    <!-- Add Content Script -->
+    <?php if ($canAddContent) { ?>
+        <script>
+            $(document).ready(function () {
+                $('.addcontent').click(function (e) {
+                    action = "add-content";
+                    e.preventDefault();
+                    var sectionId = $(this).attr('id').replace('add-content-', '');
+                    var contentTitle = $('#add-content-title-' + sectionId).val();
+                    var content = $('#add-content-text-' + sectionId).val();
+                    $.ajax({
+                        type: "POST",
+                        url: "manage/modify_course.php",
+                        data: {
+                            action: "add-content",
+                            section: sectionId,
+                            title: contentTitle,
+                            content: content
+                        },
+                        success: function (data) {
+                            data = $.parseJSON(data);
+                            var $success = data.success;
+                            var $message = data.message;
+                            var $alert = $('#courseAlert');
+                            $alert.removeClass("invisible");
+                            if ($success) {
+                                $alert.removeClass("alert-danger");
+                                $alert.addClass("alert-success");
+                                $alert.find("#courseAlertBody").html(function () {
+                                    return "<strong>Success!</strong> " + $message + ". <a href='#' onclick='window.location.reload(true);' class='alert-link'>Please refresh to see changes</a>";
+                                });
 
-                        } else {
-                            $alert.removeClass("alert-success");
-                            $alert.addClass("alert-danger");
-                            $alert.find("#courseAlertBody").html(function () {
-                                return "<strong>Error!</strong> " + $message;
-                            });
+                            } else {
+                                $alert.removeClass("alert-success");
+                                $alert.addClass("alert-danger");
+                                $alert.find("#courseAlertBody").html(function () {
+                                    return "<strong>Error!</strong> " + $message;
+                                });
+                            }
                         }
+                    });
+                });
+            });
+        </script>
+    <?php } ?>
+
+    <!-- Delete Section Script -->
+    <?php if ($canAddSection) { ?>
+        <script>
+            var sectionId;
+            var action;
+            $(document).ready(function () {
+                $('.deletesection').click(function (e) {
+                    action = "delete-section";
+                    e.preventDefault();
+                    sectionId = $(this).attr('id').replace('delete-section-', '');
+                    var $modal = $('#confirmationModal');
+                    $modal.find('.modal-body').html(function () {
+                        return "You are about delete this section."
+                                + "<br><strong>Are you sure?</strong>";
+                    });
+                    $modal.modal({
+                        show: true
+                    });
+                });
+                $('#confirmation-modal-button').click(function (e) {
+                    if (action !== "delete-section") {
+                        return;
                     }
-                });
-            });
-        });
-    </script>
-<?php } ?>
+                    action = null;
+                    e.preventDefault();
+                    $.ajax({
+                        type: "POST",
+                        url: "manage/modify_course.php",
+                        data: {
+                            action: "delete-section",
+                            section: sectionId
+                        },
+                        success: function (data) {
+                            data = $.parseJSON(data);
+                            var $success = data.success;
+                            var $message = data.message;
+                            var $alert = $('#courseAlert');
+                            $alert.removeClass("invisible");
+                            if ($success) {
+                                $alert.removeClass("alert-danger");
+                                $alert.addClass("alert-success");
+                                $alert.find("#courseAlertBody").html(function () {
+                                    return "<strong>Success!</strong> " + $message;
+                                });
+                                $('#sections-' + sectionId).remove();
 
-<!-- Delete Content Script -->
-<?php if ($canAddContent) { ?>
-    <script>
-        var contentId;
-        var action;
-        $(document).ready(function () {
-            $('.deletecontent').click(function (e) {
-                action = "delete-content";
-                e.preventDefault();
-                contentId = $(this).attr('id').replace('delete-content-', '');
-                var $modal = $('#confirmationModal');
-                $modal.find('.modal-body').html(function () {
-                    return "You are about delete this section content."
-                            + "<br><strong>Are you sure?</strong>";
-                });
-                $modal.modal({
-                    show: true
-                });
-            });
-            $('#confirmation-modal-button').click(function (e) {
-                if (action !== "delete-content") {
-                    return;
-                }
-                action = null;
-                e.preventDefault();
-                $.ajax({
-                    type: "POST",
-                    url: "manage/modify_course.php",
-                    data: {
-                        action: "delete-content",
-                        content: contentId
-                    },
-                    success: function (data) {
-                        data = $.parseJSON(data);
-                        var $success = data.success;
-                        var $message = data.message;
-                        var $alert = $('#courseAlert');
-                        $alert.removeClass("invisible");
-                        if ($success) {
-                            $alert.removeClass("alert-danger");
-                            $alert.addClass("alert-success");
-                            $alert.find("#courseAlertBody").html(function () {
-                                return "<strong>Success!</strong> " + $message;
-                            });
-                            $('#contents-' + contentId).remove();
-
-                        } else {
-                            $alert.removeClass("alert-success");
-                            $alert.addClass("alert-danger");
-                            $alert.find("#courseAlertBody").html(function () {
-                                return "<strong>Error!</strong> " + $message;
-                            });
+                            } else {
+                                $alert.removeClass("alert-success");
+                                $alert.addClass("alert-danger");
+                                $alert.find("#courseAlertBody").html(function () {
+                                    return "<strong>Error!</strong> " + $message;
+                                });
+                            }
                         }
-                    }
+                    });
                 });
             });
-        });
-    </script>
-<?php } ?>
+        </script>
+    <?php } ?>
+
+    <!-- Delete Content Script -->
+    <?php if ($canAddContent) { ?>
+        <script>
+            var contentId;
+            var action;
+            $(document).ready(function () {
+                $('.deletecontent').click(function (e) {
+                    action = "delete-content";
+                    e.preventDefault();
+                    contentId = $(this).attr('id').replace('delete-content-', '');
+                    var $modal = $('#confirmationModal');
+                    $modal.find('.modal-body').html(function () {
+                        return "You are about delete this section content."
+                                + "<br><strong>Are you sure?</strong>";
+                    });
+                    $modal.modal({
+                        show: true
+                    });
+                });
+                $('#confirmation-modal-button').click(function (e) {
+                    if (action !== "delete-content") {
+                        return;
+                    }
+                    action = null;
+                    e.preventDefault();
+                    $.ajax({
+                        type: "POST",
+                        url: "manage/modify_course.php",
+                        data: {
+                            action: "delete-content",
+                            content: contentId
+                        },
+                        success: function (data) {
+                            data = $.parseJSON(data);
+                            var $success = data.success;
+                            var $message = data.message;
+                            var $alert = $('#courseAlert');
+                            $alert.removeClass("invisible");
+                            if ($success) {
+                                $alert.removeClass("alert-danger");
+                                $alert.addClass("alert-success");
+                                $alert.find("#courseAlertBody").html(function () {
+                                    return "<strong>Success!</strong> " + $message;
+                                });
+                                $('#contents-' + contentId).remove();
+
+                            } else {
+                                $alert.removeClass("alert-success");
+                                $alert.addClass("alert-danger");
+                                $alert.find("#courseAlertBody").html(function () {
+                                    return "<strong>Error!</strong> " + $message;
+                                });
+                            }
+                        }
+                    });
+                });
+            });
+        </script>
+    <?php } ?>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
