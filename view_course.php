@@ -222,7 +222,7 @@ if (!$courseId) {
                                                     echo '</div>';
                                                     echo '<div class="row">';
                                                     echo '<strong>Role:</strong>&nbsp';
-                                                    echo ucwords($userRoleName);
+                                                    echo ucwords(str_replace("_", " ", $userRoleName));
                                                     echo '</div>';
                                                     echo '<div class="row">';
                                                     if ($userRole->HasPermission("view_profiles")) {

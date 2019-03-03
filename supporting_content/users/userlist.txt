@@ -1,0 +1,28 @@
+
+User login details (Only OpenVLE)
+
+Role = Admin
+admin@openvle.com
+efZcKlMn12@dA
+
+Role = Learner (Multiple Courses)
+openvle.multitutor@openvle.com
+daSler2$ldM01
+
+Role = Teaching Assistant (Multiple Courses)
+openvle.ta@openvle.com
+l)sdfk2#4ldd0
+
+User login details (Gmail and OpenVLE)
+
+Role = Tutor (Web Development)
+openvle.webtutor@gmail.com
+dSop2#c0dOOs1
+
+Role = Learner (Web Development)
+openvle.webstudent@gmail.com
+dLm23@LsczCx2
+
+Role = Learner (Multiple Courses)
+openvle.multistudent@gmail.com
+Lsd2#5d@czCl5
