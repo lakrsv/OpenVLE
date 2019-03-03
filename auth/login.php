@@ -234,6 +234,16 @@ class User {
 
         return $statement->fetchColumn();
     }
+    
+     public static function GetIdFromUsername($userName) {
+        $connection = MysqlConfig::Connect();
+        $sql = "SELECT id FROM Users WHERE name = :username LIMIT 1";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("username", $userName, PDO::PARAM_STR);
+        $statement->execute();
+
+        return $statement->fetchColumn();
+    }
 }
 
 if (isset($_POST['email'], $_POST['password'])) {

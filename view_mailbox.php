@@ -212,7 +212,6 @@ $showTo = $to;
                             echo '</button>';
                             echo '</h2>';
                             echo '</div>';
-                            echo '</div>';
 
                             echo '<div id="collapse-mail-' . $mail->GetId() . '" class="collapse" aria-labelledby="mail-header-' . $mail->GetId() . '" data-parent="#mail-accordion"';
                             echo '<div class="card-body">';
@@ -223,9 +222,51 @@ $showTo = $to;
                         ?>
                     </div>
                 <?php } else if ($showTo) { ?>
+                    <h5 class="card-title">New Mail</h5>
+                    <form>
+                        <div class="form-group">
+                            <label for="toUser">Recipient</label>
+                            <input type="text" class="form-control" id="toUser" aria-describedby="toUser" disabled value="<?php echo User::GetUsernameFromId($to) ?>">
+                        </div>
+                        <div class="form-group">
+                            <label for="emailTitle">Title</label>
+                            <input type="text" class="form-control" id="emailTitle" aria-describedby="emailTitle" placeholder="Enter title">
+                        </div>
+                        <div class="form-group">
+                            <label for="emailMessage">Message</label>
+                            <textarea class="form-control" id="emailMessage" aria-describedby="emailMessage" rows="6"></textarea>
+                        </div>
+                        <button id="send-mail" class="btn btn-primary" type="button">Send</button>
+                    </form>
                 <?php } ?>
             </div>
         </div>
+
+        <!-- Send Mail Script -->
+        <script>
+            $(document).ready(function () {
+                $('#send-mail').click(function (e) {
+                    e.preventDefault();
+
+                    var toUser = $('#toUser').val();
+                    var title = $('#emailTitle').val();
+                    var message = $('#emailMessage').val();
+
+                    $.ajax({
+                        type: "POST",
+                        url: "classes/mailBox.php",
+                        data: {
+                            toUser: toUser,
+                            title: title,
+                            message: message
+                        },
+                        success: function (data) {
+                            alert("Successfully sent mail to user!");
+                        }
+                    });
+                });
+            });
+        </script>
 
         <div class="container-fluid mt-2">
             <hr>
@@ -236,9 +277,9 @@ $showTo = $to;
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
     </body>
-    
-    <?php 
-    if($showUnread){
+
+    <?php
+    if ($showUnread) {
         // Clear unread email
         MailBox::SetAllReadForUser($_SESSION['userid']);
     }

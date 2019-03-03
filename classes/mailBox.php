@@ -1,6 +1,8 @@
 <?php
 
 require_once __DIR__ . '/../auth/mysql_config.php';
+require_once __DIR__ . '/../auth/smtp_config.php';
+require_once __DIR__ . '/../auth/login.php';
 
 class MailBox {
 
@@ -128,6 +130,17 @@ class MailBox {
         $statement->execute();
     }
 
+    public static function InsertNewMail($fromUserId, $toUserId, $title, $message) {
+        $connection = MysqlConfig::Connect();
+        $sql = "INSERT INTO Mail (fromUserId, toUserId, title, message) VALUES (:from, :to, :title, :message)";
+        $statement = $connection->prepare($sql);
+        $statement->bindValue("from", $fromUserId);
+        $statement->bindValue("to", $toUserId);
+        $statement->bindValue("title", $title);
+        $statement->bindValue("message", $message);
+        $statement->execute();
+    }
+
     private static function GetMailFromSqlResult($statement) {
         $mail = array();
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -146,3 +159,28 @@ class MailBox {
     }
 
 }
+
+$toUser = filter_input(INPUT_POST, "toUser", FILTER_SANITIZE_STRING);
+$title = filter_input(INPUT_POST, "title", FILTER_SANITIZE_STRING);
+$message = filter_input(INPUT_POST, "message", FILTER_SANITIZE_STRING);
+
+if (!$toUser || !$title || !$message) {
+    return;
+}
+
+require_once __DIR__.'/../header/auth_header.php';
+
+$fromUser = $_SESSION['userid'];
+$toUser = User::GetIdFromUsername($toUser);
+
+MailBox::InsertNewMail($fromUser, $toUser, $title, $message);
+
+$email = User::GetEmailFromId($toUser);
+$subject = "OpenVLE - New Mail";
+
+$body = "<p>You have new mail in your OpenVLE Inbox!</p>";
+$body .= "<p><strong>From: </strong> " . User::GetUsernameFromId($fromUser) . "</br>";
+$body .= "<p><strong>Title: </strong> " . $title . "</br></p>";
+$body .= "<strong>Message</strong></br><p>" . $message . "</p>";
+
+SmtpConfig::SendMail($email, $subject, $body);
